@@ -22,10 +22,10 @@ public class RecipeDatabase {
             String hst = prop.getProperty(host);
             String user = prop.getProperty(username);
             String pwd = prop.getProperty(password);
-            String dab = user + "DB";
+            String dab = user + "cpsc321_groupC_DB";
             String url = "jdbc:mysql://" + host + "/" + dab;
             Connection conn = DriverManager.getConnection(url, user, pwd);
-
+            conn.close();
         } catch (Exception e) {
             System.err.println("Connection failed");
         }
