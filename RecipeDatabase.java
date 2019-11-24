@@ -2,8 +2,11 @@ import java.util.*;
 import java.io.*;
 import java.sql.*;
 import java.sql.Date;
+import java.text.DateFormat;
 
 import com.mysql.jdbc.Driver;
+
+import jdk.internal.jshell.tool.Feedback.FormatErrors;
 
 public class RecipeDatabase {
     private static boolean running = true;
@@ -120,36 +123,37 @@ public class RecipeDatabase {
         boolean isNotValidInput = true;
         String password1 = "";
         String email = "";
-        String dateOfBirth = "";
-        STring country = "";
+        String country = "";
+        Date dob = null;
 
         while (isNotValidInput) {
             Console console = System.console();
 
             System.out.println("ACCOUNT CREATION:");
-            System.out.println("Enter username: ");
+            System.out.print("Enter username: ");
             String username = console.readLine();
             if (!doesUserExist(conn, username)) {
 
-                System.out.println("Enter password: ");
+                System.out.print("Enter password: ");
                 char[] passwordChars1 = console.readPassword();
-                password1 = new String(passwordChars);
+                password1 = new String(passwordChars1);
                 Arrays.fill(passwordChars1, ' ');
 
-                System.out.println("Enter your password again: ");
+                System.out.print("Enter your password again: ");
                 char[] passwordChars2 = console.readPassword();
-                password2 = new String(passwordChars);
+                String password2 = new String(passwordChars1);
                 Arrays.fill(passwordChars2, ' ');
 
                 if (password1.equals(password2)) {
-                    System.out.println("Enter email: ");
+                    System.out.print("Enter email: ");
                     email = console.readLine();
 
-                    System.out.println("Enter DOB: ");
-                    dateOfBirth = console.readLine();
-                    Date dob = dateOfBirth.
+                    System.out.print("Enter DOB (yyyy-mm-dd): ");
+                    String dateOfBirth = console.readLine();
+                    DateFormat format = new SimpleDateFormat("yyyy-mm-dd");
+                    dob = format.parse(dateOfBirth);
 
-                            System.out.println("Enter country residence: ");
+                    System.out.print("Enter country residence: ");
                     country = console.readLine();
                     isNotValidInput = false;
                     break;
@@ -175,7 +179,9 @@ public class RecipeDatabase {
             stmt1.execute();
 
             PreparedStatement stmt2 = conn.prepareStatement(passwordInsert);
-            stmt2.setString(parameterIndex, x);
+            stmt2.setString(1, username);
+            stmt2.setString(2, password);
+            stmt2.execute();
 
         } catch (SQLException e) {
             e.printStackTrace();
