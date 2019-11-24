@@ -1,10 +1,13 @@
 import java.util.*;
 import java.io.*;
 import java.sql.*;
+import java.sql.Date;
+
 import com.mysql.jdbc.Driver;
 
 public class RecipeDatabase {
     private static boolean running = true;
+    private static String currUser = "";
 
     public static void main(String[] args) {
 
@@ -55,6 +58,7 @@ public class RecipeDatabase {
             if (doesUserExist(conn, username)) {
 
                 if (isValidPassword(conn, password)) {
+                    currUser = username;
                     isNotValidInput = false;
                     break;
                 } else {
@@ -114,45 +118,68 @@ public class RecipeDatabase {
     public static void createAccountScreen(Scanner sc, Connection conn) {
 
         boolean isNotValidInput = true;
+        String password1 = "";
+        String email = "";
+        String dateOfBirth = "";
+        STring country = "";
 
         while (isNotValidInput) {
             Console console = System.console();
 
-            System.out.print("Please enter your username: ");
+            System.out.println("ACCOUNT CREATION:");
+            System.out.println("Enter username: ");
             String username = console.readLine();
+            if (!doesUserExist(conn, username)) {
 
-            System.out.print("Please enter your password: ");
-            char[] passwordChars = console.readPassword();
-            String password = new String(passwordChars);
+                System.out.println("Enter password: ");
+                char[] passwordChars1 = console.readPassword();
+                password1 = new String(passwordChars);
+                Arrays.fill(passwordChars1, ' ');
 
-            if (doesUserExist(conn, username)) {
+                System.out.println("Enter your password again: ");
+                char[] passwordChars2 = console.readPassword();
+                password2 = new String(passwordChars);
+                Arrays.fill(passwordChars2, ' ');
 
-                if (isValidPassword(conn, password)) {
+                if (password1.equals(password2)) {
+                    System.out.println("Enter email: ");
+                    email = console.readLine();
+
+                    System.out.println("Enter DOB: ");
+                    dateOfBirth = console.readLine();
+                    Date dob = dateOfBirth.
+
+                            System.out.println("Enter country residence: ");
+                    country = console.readLine();
                     isNotValidInput = false;
                     break;
+
                 } else {
-                    System.out.println("Please enter a valid username or password.");
+                    System.out.println("Your passwords do not match! Try again!");
                 }
 
             } else {
-                System.out.println("Please enter a valid username or password.");
+                System.out.println("That user already exists! Try again!");
             }
         }
 
-        System.out.println("ACCOUNT CREATION:");
-        System.out.println("Enter username: ");
-        String username = sc.next();
-        System.out.println("Enter password: ");
-        String password = sc.next();
-        System.out.println("Enter email: ");
-        String email = sc.next();
-        System.out.println("Enter DOB: ");
-        String dateOfBirth = sc.next();
-        System.out.println("Enter country residence: ");
-        String country = sc.next();
-        System.out.println(username + password + email + dateOfBirth + country);
         // insert into account database and password database
-        String query = "INSERT INTO account(username, email, dob, country_residence)";
+        String accountInsert = "INSERT INTO account VALUES(?,?,?,?)";
+        String passwordInsert = "INSERT INTO passwords VAUES(?,?)";
+        try {
+            PreparedStatement stmt1 = conn.prepareStatement(accountInsert);
+            stmt1.setString(1, username);
+            stmt1.setString(2, email);
+            stmt1.setDate(3, dob);
+            stmt1.setString(4, country_residence);
+            stmt1.execute();
+
+            PreparedStatement stmt2 = conn.prepareStatement(passwordInsert);
+            stmt2.setString(parameterIndex, x);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
     }
 
