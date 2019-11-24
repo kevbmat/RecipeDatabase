@@ -153,7 +153,11 @@ public class RecipeDatabase {
         System.out.println(username + password + email + dateOfBirth + country);
         // insert into account database and password database
         String query = "INSERT INTO account(username, email, dob, country_residence)";
+    }
 
+    public static void createRecipeScreen() {
+        System.out.println("CREATE NEW RECIPE");
+        System.out.print("Enter")
     }
 
     private static Connection connectToDB() {
