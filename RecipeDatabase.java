@@ -6,7 +6,7 @@ import java.text.DateFormat;
 
 import com.mysql.jdbc.Driver;
 
-import jdk.internal.jshell.tool.Feedback.FormatErrors;
+//import jdk.internal.jshell.tool.Feedback.FormatErrors;
 
 public class RecipeDatabase {
     private static boolean running = true;
@@ -17,7 +17,8 @@ public class RecipeDatabase {
         Scanner userinput = new Scanner(System.in);
         Connection dbConn = connectToDB();
         while (running) {
-            introScreen(userinput, dbConn);
+            //introScreen(userinput, dbConn);
+            updateRecipe(dbConn, userinput);
         }
 
     }
@@ -118,8 +119,9 @@ public class RecipeDatabase {
         return false;
     }
 
+    
     public static void createAccountScreen(Scanner sc, Connection conn) {
-
+/*
         boolean isNotValidInput = true;
         String password1 = "";
         String email = "";
@@ -185,7 +187,8 @@ public class RecipeDatabase {
 
         } catch (SQLException e) {
             e.printStackTrace();
-        }
+        }*/
+    }
 
     public static void createRecipeScreen() {
         Scanner sc = new Scanner(System.in);
@@ -228,5 +231,35 @@ public class RecipeDatabase {
 
         }
         return null;
+    }
+
+    public static void updateRecipe(Connection con, Scanner sc) {
+        try{
+            Statement stmt = con.createStatement();
+            ResultSet set = stmt.executeQuery("SELECT u.recipe_id, r.title FROM user_recipes u JOIN recipe r USING(recipe_id)" +
+                                    " WHERE username = 'Alice'");
+
+            System.out.println("Your Recipes: ");
+            while(set.next()) {
+                System.out.println(set.getString(1) + ": " + set.getString(2));
+            }
+        }
+        catch (SQLException e) {
+            System.out.println(e);
+            return;
+        }
+
+        System.out.print("\nWhich recipe would you like to update or change? Enter id number: ");
+        String choice = sc.nextLine();
+
+        System.out.print("\nPlease enter a new title: ");
+        String newTitle = sc.nextLine();
+
+        System.out.print("\nPlease enter new ingredients: ");
+        String newIngredients = sc.nextLine();
+
+        System.out.print("\nPlease enter new instructions: ");
+        String newInstructions = sc.nextLine();
+
     }
 }
