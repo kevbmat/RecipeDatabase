@@ -250,7 +250,9 @@ public class RecipeDatabase {
         }
 
         System.out.print("\nWhich recipe would you like to update or change? Enter id number: ");
-        String choice = sc.nextLine();
+        String choice = sc.nextLine().charAt(0);
+
+        //add input validation here, checking that choice is in the first column of ResultSet
 
         System.out.print("\nPlease enter a new title: ");
         String newTitle = sc.nextLine();
@@ -260,6 +262,12 @@ public class RecipeDatabase {
 
         System.out.print("\nPlease enter new instructions: ");
         String newInstructions = sc.nextLine();
+
+        String update = ("UPDATE recipe SET title= '" + newTitle + "', ingredients = '" + 
+                                newIngredients + "', instructions = '" + newInstructions + "' WHERE recipe_id = " + choice);
+
+        try{stmnt.executeQuery(update);}
+        catch(SQLException e){System.out.println(e);}
 
     }
 }
