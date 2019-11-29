@@ -24,6 +24,7 @@ public class RecipeDatabase {
         System.out.println("Select option below");
         System.out.println("(1) Login to application");
         System.out.println("(2) Create a new account");
+        System.out.println("(3) Exit program");
 
         char input = sc.nextLine().charAt(0);
         switch (input) {
@@ -103,6 +104,7 @@ public class RecipeDatabase {
             System.out.print("Please enter the id of the recipe to be deleted: ");
             try {
                 recipeId = userinput.nextInt();
+                userinput.nextLine();
                 if (isValidRecipeId(recipeId, conn)) {
                     isNotValidInput = false;
                     break;
@@ -114,12 +116,25 @@ public class RecipeDatabase {
             }
         }
 
-        String query = "DELETE FROM recipe WHERE id=?";
+        String query1 = "DELETE FROM recipe_type WHERE recipe_id=?";
+        String query2 = "DELETE FROM user_recipes WHERE recipe_id=?";
+        String query3 = "DELETE FROM recipe WHERE recipe_id=?";
+
         try {
-            PreparedStatement stmt = conn.prepareStatement(query);
-            stmt.setInt(1, recipeId);
-            stmt.execute();
+            PreparedStatement stmt1 = conn.prepareStatement(query1);
+            stmt1.setInt(1, recipeId);
+            stmt1.execute();
+
+            PreparedStatement stmt2 = conn.prepareStatement(query2);
+            stmt2.setInt(1, recipeId);
+            stmt2.execute();
+
+            PreparedStatement stmt3 = conn.prepareStatement(query3);
+            stmt3.setInt(1, recipeId);
+            stmt3.execute();
+
         } catch (SQLException e) {
+            e.printStackTrace();
             System.out.println("Error in deleting recipe");
         }
 
@@ -131,7 +146,7 @@ public class RecipeDatabase {
         }
 
         try {
-            String query = "SELECT * FROM recipe WHERE id=?";
+            String query = "SELECT * FROM recipe WHERE recipe_id=?";
 
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setInt(1, id);
@@ -205,8 +220,9 @@ public class RecipeDatabase {
                     System.out.print("Enter country residence: ");
                     country = console.readLine();
 
-                    if (username.equals("") || password1.equals("") || email.equals("") || country.equals("")
-                            || dob.equals("")) {
+                    if ((username.equals("") || password1.equals("") || email.equals("") || country.equals("")
+                            || dob.equals(""))
+                            || (username.length() > 30 || password1.length() > 30 || country.length() > 2)) {
                         System.out.println("Invalid input. Please enter valid input.");
                     } else {
                         isNotValidInput = false;
@@ -224,7 +240,7 @@ public class RecipeDatabase {
 
         // insert into account database and password database
         String accountInsert = "INSERT INTO account VALUES(?,?,?,?)";
-        String passwordInsert = "INSERT INTO passwords VAUES(?,?)";
+        String passwordInsert = "INSERT INTO passwords VALUES(?,?)";
         try {
             PreparedStatement stmt1 = conn.prepareStatement(accountInsert);
             stmt1.setString(1, username);
