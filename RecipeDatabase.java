@@ -278,6 +278,16 @@ public class RecipeDatabase {
             System.out.print("Enter ingredient " + i + 1 + ": ");
             instructions.append(sc.nextLine());
         }
+        String recipeInsert = "INSERT INTO recipe (title, date_posted, view_flag, ingredients, instructions) VALUES (?, CURRENT_TIMESTAMP, TRUE, ?, ?)";
+        try {
+            PreparedStatement stmt = conn.prepareStatement(recipeInsert);
+            stmt.setString(1, title);
+            stmt.setString(2, ingredients.toString());
+            stmt.setString(3, instructions.toString());
+        } catch (Exception e) {
+            System.out.println("Error: failed to add recipe");
+            e.printStackTrace();
+        }
     }
 
     private static Connection connectToDB() {
