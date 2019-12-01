@@ -258,11 +258,10 @@ public class RecipeDatabase {
             e.printStackTrace();
         }
 
-    public static void createRecipeScreen() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("CREATE NEW RECIPE");
-        System.out.print("Enter recipe title: ");
-        String title = sc.next();
+    }
+
+    private static void createRecipe() {
+        
     }
 
     private static Connection connectToDB() {
