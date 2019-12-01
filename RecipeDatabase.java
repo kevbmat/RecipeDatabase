@@ -277,16 +277,16 @@ public class RecipeDatabase {
         System.out.print("Enter number of ingredients: ");
         int numIngredients = sc.nextInt();
         StringBuilder ingredients = new StringBuilder();
-        for (int i = 1; i <= numIngredients; i++) {
-            System.out.print("Enter ingredient " + i + ": ");
-            ingredients.append(sc.next());
+        System.out.println("Enter " + numIngredients + " ingredients:");
+        for (int i = 0; i <= numIngredients; i++) {
+            ingredients.append(sc.nextLine());
         }
         System.out.print("Enter number of instructions: ");
         int numInstructions = sc.nextInt();
         StringBuilder instructions = new StringBuilder();
-        for (int i = 1; i <= numInstructions; i++) {
-            System.out.print("Enter instruction: " + i + ": ");
-            instructions.append(sc.next());
+        System.out.println("Enter " + numInstructions + " instructions:");
+        for (int i = 0; i <= numInstructions; i++) {
+            instructions.append(sc.nextLine());
         }
         String recipeInsert = "INSERT INTO recipe (title, date_posted, view_flag, ingredients, instructions) VALUES (?, CURRENT_TIMESTAMP, TRUE, ?, ?)";
         try {
@@ -294,10 +294,12 @@ public class RecipeDatabase {
             stmt.setString(1, title);
             stmt.setString(2, ingredients.toString());
             stmt.setString(3, instructions.toString());
+            stmt.execute();
         } catch (Exception e) {
             System.out.println("Error: failed to add recipe");
             e.printStackTrace();
         }
+        // insert into food and user_recipe
     }
 
     private static Connection connectToDB() {
