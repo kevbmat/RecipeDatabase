@@ -73,6 +73,16 @@ public class RecipeDatabase {
         }
 
         System.out.println("YOU ARE IN BOIIIIIII");
+        System.out.println("Enter a choice ");
+        System.out.println("(1) Create new recipe");
+        char input = sc.nextLine().charAt(0);
+        switch (input) {
+        case '1':
+            createRecipe(conn);
+            break;
+        default:
+            System.out.println("Invalid choice");
+        }
     }
 
     private static boolean doesUserExist(Connection conn, String username) {
@@ -262,21 +272,21 @@ public class RecipeDatabase {
 
     private static void createRecipe(Connection conn) {
         Scanner sc = new Scanner(System.in);
-        System.out.print("Enter recipe title");
-        String title = sc.next();
+        System.out.print("Enter recipe title: ");
+        String title = sc.nextLine();
         System.out.print("Enter number of ingredients: ");
         int numIngredients = sc.nextInt();
         StringBuilder ingredients = new StringBuilder();
-        for (int i = 0; i < numIngredients; i++) {
-            System.out.print("Enter ingredient " + i + 1 + ": ");
-            ingredients.append(sc.nextLine());
+        for (int i = 1; i <= numIngredients; i++) {
+            System.out.print("Enter ingredient " + i + ": ");
+            ingredients.append(sc.next());
         }
         System.out.print("Enter number of instructions: ");
         int numInstructions = sc.nextInt();
         StringBuilder instructions = new StringBuilder();
-        for (int i = 0; i < numInstructions; i++) {
-            System.out.print("Enter ingredient " + i + 1 + ": ");
-            instructions.append(sc.nextLine());
+        for (int i = 1; i <= numInstructions; i++) {
+            System.out.print("Enter instruction: " + i + ": ");
+            instructions.append(sc.next());
         }
         String recipeInsert = "INSERT INTO recipe (title, date_posted, view_flag, ingredients, instructions) VALUES (?, CURRENT_TIMESTAMP, TRUE, ?, ?)";
         try {
