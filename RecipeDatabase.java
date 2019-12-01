@@ -260,8 +260,24 @@ public class RecipeDatabase {
 
     }
 
-    private static void createRecipe() {
-        
+    private static void createRecipe(Connection conn) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter recipe title");
+        String title = sc.next();
+        System.out.print("Enter number of ingredients: ");
+        int numIngredients = sc.nextInt();
+        StringBuilder ingredients = new StringBuilder();
+        for (int i = 0; i < numIngredients; i++) {
+            System.out.print("Enter ingredient " + i + 1 + ": ");
+            ingredients.append(sc.nextLine());
+        }
+        System.out.print("Enter number of instructions: ");
+        int numInstructions = sc.nextInt();
+        StringBuilder instructions = new StringBuilder();
+        for (int i = 0; i < numInstructions; i++) {
+            System.out.print("Enter ingredient " + i + 1 + ": ");
+            instructions.append(sc.nextLine());
+        }
     }
 
     private static Connection connectToDB() {
