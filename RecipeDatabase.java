@@ -234,10 +234,13 @@ public class RecipeDatabase {
     }
 
     public static void updateRecipe(Connection con, Scanner sc) {
+
+        System.out.println("Updating Recipe \n");
+
         try{
             Statement stmt = con.createStatement();
             ResultSet set = stmt.executeQuery("SELECT u.recipe_id, r.title FROM user_recipes u JOIN recipe r USING(recipe_id)" +
-                                    " WHERE username = 'Alice'");
+                                    " WHERE username = 'Alice'");// replace Alice with currUser
 
             System.out.println("Your Recipes: ");
             while(set.next()) {
@@ -268,6 +271,8 @@ public class RecipeDatabase {
 
         try{stmnt.executeQuery(update);}
         catch(SQLException e){System.out.println(e);}
+
+
 
     }
 }
