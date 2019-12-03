@@ -7,20 +7,29 @@ import java.sql.Date;
 import com.mysql.jdbc.Driver;
 
 public class RecipeDatabase {
-    private static boolean running = true;
     private static String currUser = "";
 
     public static void main(String[] args) {
 
         Scanner userinput = new Scanner(System.in);
         Connection dbConn = connectToDB();
-        while (running) {
-            introScreen(userinput, dbConn);
+
+        boolean inIntroMenu = true;
+        while (inIntroMenu) {
+            int result = introScreen(userinput, dbConn);
+            if (result == 1) {
+                inIntroMenu = false;
+                break;
+            } else if (result == 3) {
+                System.out.println("Ending Program :)");
+                System.exit(0);
+            }
         }
 
+        mainMenu(userinput, dbConn);
     }
 
-    public static void introScreen(Scanner sc, Connection conn) {
+    public static int introScreen(Scanner sc, Connection conn) {
         System.out.println("Select option below");
         System.out.println("(1) Login to application");
         System.out.println("(2) Create a new account");
@@ -29,19 +38,21 @@ public class RecipeDatabase {
         char input = sc.nextLine().charAt(0);
         switch (input) {
         case '1':
+            System.out.println();
             loginScreen(sc, conn);
-            break;
+            System.out.println();
+            return 1;
         case '2':
+            System.out.println();
             createAccountScreen(sc, conn);
-            break;
+            return 2;
         case '3':
-            running = false;
-            System.out.println("Ending Program :)");
-            System.exit(0);
-            break;
+            return 3;
         default:
             System.out.println("Invalid choice");
         }
+        // just need this so java doesnt complain
+        return -1;
     }
 
     public static void loginScreen(Scanner sc, Connection conn) {
@@ -71,8 +82,76 @@ public class RecipeDatabase {
                 System.out.println("Please enter a valid username or password.");
             }
         }
+    }
 
-        System.out.println("YOU ARE IN BOIIIIIII");
+    private static void mainMenu(Scanner sc, Connection conn) {
+        boolean inMainMenu = true;
+        System.out.println("Welcome " + currUser + "!");
+
+        while (inMainMenu) {
+            System.out.println("Select option below");
+            System.out.println("(1) Recipes");
+            System.out.println("(2) Social");
+            System.out.println("(3) Exit");
+
+            char input = sc.nextLine().charAt(0);
+            switch (input) {
+            case '1':
+                System.out.println();
+                recipeMenu(sc, conn);
+                break;
+            case '2':
+                System.out.println();
+                // socialMenu(sc, conn);
+                break;
+            case '3':
+                inMainMenu = false;
+                System.out.println("Ending Program :)");
+                System.exit(0);
+                break;
+            default:
+                System.out.println("Invalid choice");
+            }
+        }
+    }
+
+    private static void recipeMenu(Scanner sc, Connection conn) {
+        boolean inRecipeMenu = true;
+
+        while (inRecipeMenu) {
+            System.out.println("Select option below");
+            System.out.println("(1) View Recipes");
+            System.out.println("(2) Add Recipe");
+            System.out.println("(3) Update Recipe");
+            System.out.println("(4) Delete Recipe");
+            System.out.println("(5) Return to main menu");
+
+            char input = sc.nextLine().charAt(0);
+            switch (input) {
+            case '1':
+                System.out.println();
+                // view recipes function(s) go here
+                break;
+            case '2':
+                System.out.println();
+                // add recipe function(s) go here
+                break;
+            case '3':
+                System.out.println();
+                // update recipe function(s) go here
+                break;
+            case '4':
+                System.out.println();
+                deleteRecipe(sc, conn);
+                break;
+            case '5':
+                inRecipeMenu = false;
+                System.out.println();
+                break;
+            default:
+                System.out.println("Invalid choice");
+            }
+        }
     }
 
     private static boolean doesUserExist(Connection conn, String username) {
@@ -226,6 +305,7 @@ public class RecipeDatabase {
                         System.out.println("Invalid input. Please enter valid input.");
                     } else {
                         isNotValidInput = false;
+                        System.out.println();
                         break;
                     }
 
@@ -257,6 +337,7 @@ public class RecipeDatabase {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
 
     public static void createRecipeScreen() {
         Scanner sc = new Scanner(System.in);
