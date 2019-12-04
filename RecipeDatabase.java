@@ -130,7 +130,7 @@ public class RecipeDatabase {
             switch (input) {
             case '1':
                 System.out.println();
-                // view recipes function(s) go here
+                listRecipes(conn);
                 break;
             case '2':
                 System.out.println();
@@ -247,7 +247,7 @@ public class RecipeDatabase {
         }
 
         try {
-            String query = "SELECT * FROM passwords WHERE password=?";
+            String query = "SELECT * FROM account WHERE password=?";
 
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, password);
@@ -319,24 +319,67 @@ public class RecipeDatabase {
         }
 
         // insert into account database and password database
-        String accountInsert = "INSERT INTO account VALUES(?,?,?,?)";
-        String passwordInsert = "INSERT INTO passwords VALUES(?,?)";
+        String accountInsert = "INSERT INTO account VALUES(?,?,?,?,?)";
+
         try {
             PreparedStatement stmt1 = conn.prepareStatement(accountInsert);
             stmt1.setString(1, username);
             stmt1.setString(2, email);
             stmt1.setString(3, dob);
             stmt1.setString(4, country);
+            stmt1.setString(5, password1);
             stmt1.execute();
-
-            PreparedStatement stmt2 = conn.prepareStatement(passwordInsert);
-            stmt2.setString(1, username);
-            stmt2.setString(2, password1);
-            stmt2.execute();
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void listRecipes(Connection conn) {
+        try {
+            Statement stmt = conn.createStatement();
+            String q = "SELECT * FROM recipe";
+            ResultSet rs = stmt.executeQuery(q);
+
+            while (rs.next()) {
+                int recid = rs.getInt("recipe_id");
+                String name = rs.getString("title");
+                Timestamp date = rs.getTimestamp("date_posted");
+                String strDate = parseDate(date);
+
+                Blob ingredients = rs.getBlob("ingredients");
+                byte[] blobIngrBytes = ingredients.getBytes(1, (int) ingredients.length());
+                String strIngr = new String(blobIngrBytes);
+
+                Blob instructions = rs.getBlob("instructions");
+                byte[] blobInstrBytes = instructions.getBytes(1, (int) instructions.length());
+                String strInstr = new String(blobInstrBytes);
+
+                System.out.println("(" + recid + "): " + name);
+                System.out.println("Date Posted: " + strDate);
+                System.out.println("Ingredients: " + strIngr);
+                System.out.println("Instructions:");
+                printInstructions(strInstr);
+
+                System.out.println();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Error in viewing recipes");
+        }
+    }
+
+    private static void printInstructions(String strInstr) {
+        String[] instructionInfo = strInstr.split("[,]+\\s+");
+
+        for (int i = 0; i < instructionInfo.length; i++) {
+            System.out.println("    " + instructionInfo[i]);
+        }
+    }
+
+    private static String parseDate(Timestamp date) {
+        String[] dateInfo = date.toString().split("[ ]+");
+        return dateInfo[0];
     }
 
     public static void createRecipeScreen() {
