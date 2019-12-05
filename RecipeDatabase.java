@@ -739,11 +739,11 @@ public class RecipeDatabase {
             String newIngredients = sc.nextLine();
             System.out.print("\nPlease enter new instructions (separated by commas): ");
             String newInstructions = sc.nextLine();
-            String update = ("UPDATE recipe SET title= '" + newTitle + "', ingredients = '" + newIngredients
+            String update = ("UPDATE recipe SET title='" + newTitle + "', ingredients = '" + newIngredients
                     + "', instructions = '" + newInstructions + "' WHERE recipe_id = " + choice);
             try {
-                PreparedStatement stmt = con.prepareStatement(update);
-                stmt.execute(update);
+                PreparedStatement stmt1 = con.prepareStatement(update);
+                stmt1.execute(update);
             } catch (SQLException e) {
                 System.out.println(e);
             }
@@ -756,12 +756,12 @@ public class RecipeDatabase {
     }
 
     private static boolean isUpdatableRecipe(int id, Connection conn) {
-        String query = "SELECT u.recipe_id" + "FROM user_recipes u JOIN recipe r USING(recipe_id) "
+        String query = "SELECT u.recipe_id " + "FROM user_recipes u JOIN recipe r USING(recipe_id) "
                 + "WHERE u.username=? AND u.recipe_id=?";
 
         try {
             PreparedStatement stmt = conn.prepareStatement(query);
-            stmt.setString(1, "username");
+            stmt.setString(1, currUser);
             stmt.setInt(2, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {

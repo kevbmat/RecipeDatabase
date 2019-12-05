@@ -17,9 +17,6 @@ CREATE TABLE account (
     PRIMARY KEY (username)
 );
 
-
-
-
 CREATE TABLE following (
     account1 VARCHAR(30) NOT NULL,
     account2 VARCHAR(30) NOT NULL,
@@ -44,7 +41,7 @@ CREATE TABLE comments(
     comment BLOB NOT NULL,
     PRIMARY KEY(comment_id),
     FOREIGN KEY(username) REFERENCES account(username),
-    FOREIGN KEY(recipe_id) REFERENCES recipe(recipe_id)
+    FOREIGN KEY(recipe_id) REFERENCES recipe(recipe_id) ON UPDATE CASCADE
 );
 
 CREATE TABLE user_recipes (
@@ -52,7 +49,7 @@ CREATE TABLE user_recipes (
     recipe_id INT UNSIGNED NOT NULL,
     PRIMARY KEY (username, recipe_id),
     FOREIGN KEY (username) REFERENCES account (username),
-    FOREIGN KEY (recipe_id) REFERENCES recipe (recipe_id)
+    FOREIGN KEY (recipe_id) REFERENCES recipe (recipe_id) ON UPDATE CASCADE
 );
 
 CREATE TABLE food (
@@ -64,8 +61,8 @@ CREATe TABLE recipe_type (
     recipe_id INT UNSIGNED NOT NULL,
     food_type VARCHAR(30) NOT NULL,
     PRIMARY KEY (recipe_id, food_type),
-    FOREIGN KEY (recipe_id) REFERENCES recipe (recipe_id),
-    FOREIGN KEY (food_type) REFERENCES food (food_type)
+    FOREIGN KEY (food_type) REFERENCES food (food_type),
+    FOREIGN KEY (recipe_id) REFERENCES recipe (recipe_id) ON UPDATE CASCADE
 );
 
 INSERT INTO food VALUES

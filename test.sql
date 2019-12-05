@@ -1,5 +1,3 @@
-SELECT DISTINCT account2
-FROM following 
-WHERE account2 NOT IN (SELECT account2
-                        FROM following 
-                        WHERE account1 = 'Charlie' OR account2 = 'Charlie');
+SELECT u.recipe_id, r.title
+FROM user_recipes u JOIN recipe r USING(recipe_id)
+WHERE u.username='Alice';
