@@ -1,3 +1,18 @@
+
+/**
+ * This program is a recipe social network which leverages the cpsc321_groupC_DB on the cps-database at Gonzaga University
+ * @author: Cole deSilva, Andrew Flagstead, Kevin Mattappally, Brandon Clark
+ * @version: v1.0
+ * @assignment: Final Project!
+ * @date: 12/5/2019
+ * @course: CPSC321
+ * 
+ * Possible improvemnts to be made: 
+ *      (1) make input scanner and connection variables global variables and initialize them in main 
+ *          so that we dont have to pass them everywhere
+ *      (2) make all of our SQL strings consistent in terms of style and ensure all are using prepared statements
+ *      (3) work on better input validation
+ */
 import java.util.*;
 import java.io.*;
 import java.nio.charset.MalformedInputException;
@@ -12,8 +27,10 @@ public class RecipeDatabase {
     public static void main(String[] args) {
 
         Scanner userinput = new Scanner(System.in);
+        // menu which promts database user to login to database
         Connection dbConn = connectToDB();
 
+        // once into the DB, intro menu for our program
         boolean inIntroMenu = true;
         while (inIntroMenu) {
             int result = introScreen(userinput, dbConn);
@@ -26,9 +43,19 @@ public class RecipeDatabase {
             }
         }
 
+        // once authenticated, the main menu will be presented
         mainMenu(userinput, dbConn);
     }
 
+    /**
+     * the intro menu for our program where users can login with an existing account
+     * or create a new account
+     * 
+     * @param sc
+     * @param conn
+     * @return an integer value if the user successfully logged in, created an
+     *         account, or exited the program.
+     */
     public static int introScreen(Scanner sc, Connection conn) {
         System.out.println("Select option below");
         System.out.println("(1) Login to application");
@@ -55,6 +82,10 @@ public class RecipeDatabase {
         return -1;
     }
 
+    /**
+     * login input validation loop makes sure that the username and password are
+     * valid
+     */
     public static void loginScreen(Scanner sc, Connection conn) {
         boolean isNotValidInput = true;
 
@@ -84,6 +115,13 @@ public class RecipeDatabase {
         }
     }
 
+    /**
+     * main menu for our program where the user can go into the different menus:
+     * recipe menu, social menu, or exit the program
+     * 
+     * @param sc
+     * @param conn
+     */
     private static void mainMenu(Scanner sc, Connection conn) {
         boolean inMainMenu = true;
         System.out.println("Welcome " + currUser + "!");
@@ -115,6 +153,13 @@ public class RecipeDatabase {
         }
     }
 
+    /**
+     * recipe menu for the program where users can be taken to functions to
+     * view/add/update/delete recipes
+     * 
+     * @param sc
+     * @param conn
+     */
     private static void recipeMenu(Scanner sc, Connection conn) {
         boolean inRecipeMenu = true;
 
@@ -155,6 +200,13 @@ public class RecipeDatabase {
         }
     }
 
+    /**
+     * social menu for our application where users can look at their news feed, see
+     * trending users, follow/unfollow people, and add comments to recipes.
+     * 
+     * @param sc
+     * @param conn
+     */
     private static void socialMenu(Scanner sc, Connection conn) {
         boolean inSocialMenu = true;
 
