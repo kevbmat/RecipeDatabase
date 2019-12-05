@@ -662,16 +662,18 @@ public class RecipeDatabase {
         String title = sc.nextLine();
         System.out.print("Enter number of ingredients: ");
         int numIngredients = sc.nextInt();
+        sc.nextLine();
         StringBuilder ingredients = new StringBuilder();
-        System.out.println("Enter " + numIngredients + " ingredients:");
-        for (int i = 0; i <= numIngredients; i++) {
+        System.out.println("Enter " + numIngredients + " ingredients (comma separated):");
+        for (int i = 0; i < numIngredients; i++) {
             ingredients.append(sc.nextLine());
         }
         System.out.print("Enter number of instructions: ");
         int numInstructions = sc.nextInt();
+        sc.nextLine();
         StringBuilder instructions = new StringBuilder();
-        System.out.println("Enter " + numInstructions + " instructions:");
-        for (int i = 0; i <= numInstructions; i++) {
+        System.out.println("Enter " + numInstructions + " instructions (comma separated):");
+        for (int i = 0; i < numInstructions; i++) {
             instructions.append(sc.nextLine());
         }
         String recipeInsert = "INSERT INTO recipe (title, date_posted, view_flag, ingredients, instructions) VALUES (?, CURRENT_TIMESTAMP, TRUE, ?, ?)";
