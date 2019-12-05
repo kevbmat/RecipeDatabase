@@ -232,24 +232,24 @@ public class RecipeDatabase {
             e.printStackTrace();
         }
     }
-    public static void listTrending(Scanner sc, Connection conn){
-        System.out.println("Trending User(s):");
-        String trending = "select username, COUNT(*) as number_of_recipes "+
-                            "from user_recipes "+
-                            "GROUP BY username "+
-                            "HAVING COUNT(*) = (select max(most_recipes) from "+
-                                "(select username, count(*) as most_recipes " +
-                                    "from user_recipes group by username) as sq)";
 
-        try{
+    public static void listTrending(Scanner sc, Connection conn) {
+        System.out.println("Trending User(s):");
+        String trending = "select username, COUNT(*) as number_of_recipes " + "from user_recipes "
+                + "GROUP BY username " + "HAVING COUNT(*) = (select max(most_recipes) from "
+                + "(select username, count(*) as most_recipes " + "from user_recipes group by username) as sq)";
+
+        try {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(trending);
-            while(rs.next())
+            while (rs.next())
                 System.out.println(rs.getString(1) + ": " + rs.getString(2));
         }
 
-        catch (SQLException e){System.out.println(e);}
-        
+        catch (SQLException e) {
+            System.out.println(e);
+        }
+
         System.out.println();
         System.out.println();
 
@@ -709,34 +709,65 @@ public class RecipeDatabase {
     }
 
     public static void updateRecipe(Scanner sc, Connection con) {
-        // System.out.println("Updating Recipe \n");
-        // try{
-        //     Statement stmt = con.createStatement();
-        //     ResultSet set = stmt.executeQuery("SELECT u.recipe_id, r.title FROM user_recipes u JOIN recipe r USING(recipe_id)" +
-        //                             " WHERE username = '" + currUser + "'");// replace Alice with currUser
+        System.out.println("Updating Recipe \n");
 
-        //     System.out.println("Your Recipes: ");
-        //     while(set.next()) {
-        //         System.out.println(set.getString(1) + ": " + set.getString(2));
-        //     }
-        // }
-        // catch (SQLException e) {
-        //     System.out.println(e);
-        //     return;
-        // }
-        // System.out.print("\nWhich recipe would you like to update or change? Enter id number: ");
-        // char choice = sc.nextLine().charAt(0);
-        // //add input validation here, checking that choice is in the first column of ResultSet
-        // System.out.print("\nPlease enter a new title: ");
-        // String newTitle = sc.nextLine();
-        // System.out.print("\nPlease enter new ingredients: ");
-        // String newIngredients = sc.nextLine();
-        // System.out.print("\nPlease enter new instructions: ");
-        // String newInstructions = sc.nextLine();
-        // String update = ("UPDATE recipe SET title= '" + newTitle + "', ingredients = '" + 
-        //                         newIngredients + "', instructions = '" + newInstructions + "' WHERE recipe_id = " + choice);
-        // try{stmt.executeQuery(update);}
-        // catch(SQLException e){System.out.println(e);}
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet set = stmt
+                    .executeQuery("SELECT u.recipe_id, r.title FROM user_recipes u JOIN recipe r USING(recipe_id)"
+                            + " WHERE u.username = '" + currUser + "'");// replace Alice with currUser
+
+            System.out.println("Your Recipes: ");
+            while (set.next()) {
+                System.out.println(set.getString(1) + ": " + set.getString(2));
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+            return;
+        }
+
+        System.out.print("\nWhich recipe would you like to update or change? Enter id number: ");
+        String choice = sc.nextLine();
+        int id = Integer.parseInt(choice);
+        if (isUpdatableRecipe(id, con)) {
+            System.out.print("\nPlease enter a new title: ");
+            String newTitle = sc.nextLine();
+            System.out.print("\nPlease enter new ingredients (separated by commas): ");
+            String newIngredients = sc.nextLine();
+            System.out.print("\nPlease enter new instructions (separated by commas): ");
+            String newInstructions = sc.nextLine();
+            String update = ("UPDATE recipe SET title= '" + newTitle + "', ingredients = '" + newIngredients
+                    + "', instructions = '" + newInstructions + "' WHERE recipe_id = " + choice);
+            try {
+                PreparedStatement stmt = con.prepareStatement(update);
+                stmt.execute(update);
+            } catch (SQLException e) {
+                System.out.println(e);
+            }
+        } else {
+            System.out.println("Please enter a valid recipe id that you would like to update");
+        }
+        // add input validation here, checking that choice is in the first column of
+        // ResultSet
+
+    }
+
+    private static boolean isUpdatableRecipe(int id, Connection conn) {
+        String query = "SELECT u.recipe_id" + "FROM user_recipes u JOIN recipe r USING(recipe_id) "
+                + "WHERE u.username=? AND u.recipe_id=?";
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, "username");
+            stmt.setInt(2, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private static Connection connectToDB() {
