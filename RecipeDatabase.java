@@ -173,7 +173,7 @@ public class RecipeDatabase {
                 break;
             case '2':
                 System.out.println();
-
+                listTrending(sc, conn);
                 break;
             case '3':
                 System.out.println();
@@ -191,6 +191,29 @@ public class RecipeDatabase {
                 System.out.println("Invalid choice");
             }
         }
+    }
+
+    public static void listTrending(Scanner sc, Connection conn){
+        System.out.println("Trending User(s):");
+        String trending = "select username, COUNT(*) as number_of_recipes "+
+                            "from user_recipes "+
+                            "GROUP BY username "+
+                            "HAVING COUNT(*) = (select max(most_recipes) from "+
+                                "(select username, count(*) as most_recipes " +
+                                    "from user_recipes group by username) as sq)";
+
+        try{
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(trending);
+            while(rs.next())
+                System.out.println(rs.getString(1) + ": " + rs.getString(2));
+        }
+
+        catch (SQLException e){System.out.println(e);}
+        
+        System.out.println();
+        System.out.println();
+
     }
 
     private static boolean doesUserExist(Connection conn, String username) {
