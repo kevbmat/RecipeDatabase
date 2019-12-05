@@ -7,20 +7,29 @@ import java.sql.Date;
 import com.mysql.jdbc.Driver;
 
 public class RecipeDatabase {
-    private static boolean running = true;
     private static String currUser = "";
 
     public static void main(String[] args) {
 
         Scanner userinput = new Scanner(System.in);
         Connection dbConn = connectToDB();
-        while (running) {
-            introScreen(userinput, dbConn);
+
+        boolean inIntroMenu = true;
+        while (inIntroMenu) {
+            int result = introScreen(userinput, dbConn);
+            if (result == 1) {
+                inIntroMenu = false;
+                break;
+            } else if (result == 3) {
+                System.out.println("Ending Program :)");
+                System.exit(0);
+            }
         }
 
+        mainMenu(userinput, dbConn);
     }
 
-    public static void introScreen(Scanner sc, Connection conn) {
+    public static int introScreen(Scanner sc, Connection conn) {
         System.out.println("Select option below");
         System.out.println("(1) Login to application");
         System.out.println("(2) Create a new account");
@@ -29,19 +38,21 @@ public class RecipeDatabase {
         char input = sc.nextLine().charAt(0);
         switch (input) {
         case '1':
+            System.out.println();
             loginScreen(sc, conn);
-            break;
+            System.out.println();
+            return 1;
         case '2':
+            System.out.println();
             createAccountScreen(sc, conn);
-            break;
+            return 2;
         case '3':
-            running = false;
-            System.out.println("Ending Program :)");
-            System.exit(0);
-            break;
+            return 3;
         default:
             System.out.println("Invalid choice");
         }
+        // just need this so java doesnt complain
+        return -1;
     }
 
     public static void loginScreen(Scanner sc, Connection conn) {
@@ -71,8 +82,76 @@ public class RecipeDatabase {
                 System.out.println("Please enter a valid username or password.");
             }
         }
+    }
 
-        System.out.println("YOU ARE IN BOIIIIIII");
+    private static void mainMenu(Scanner sc, Connection conn) {
+        boolean inMainMenu = true;
+        System.out.println("Welcome " + currUser + "!");
+
+        while (inMainMenu) {
+            System.out.println("Select option below");
+            System.out.println("(1) Recipes");
+            System.out.println("(2) Social");
+            System.out.println("(3) Exit");
+
+            char input = sc.nextLine().charAt(0);
+            switch (input) {
+            case '1':
+                System.out.println();
+                recipeMenu(sc, conn);
+                break;
+            case '2':
+                System.out.println();
+                // socialMenu(sc, conn);
+                break;
+            case '3':
+                inMainMenu = false;
+                System.out.println("Ending Program :)");
+                System.exit(0);
+                break;
+            default:
+                System.out.println("Invalid choice");
+            }
+        }
+    }
+
+    private static void recipeMenu(Scanner sc, Connection conn) {
+        boolean inRecipeMenu = true;
+
+        while (inRecipeMenu) {
+            System.out.println("Select option below");
+            System.out.println("(1) View Recipes");
+            System.out.println("(2) Add Recipe");
+            System.out.println("(3) Update Recipe");
+            System.out.println("(4) Delete Recipe");
+            System.out.println("(5) Return to main menu");
+
+            char input = sc.nextLine().charAt(0);
+            switch (input) {
+            case '1':
+                System.out.println();
+                listRecipes(conn);
+                break;
+            case '2':
+                System.out.println();
+                // add recipe function(s) go here
+                break;
+            case '3':
+                System.out.println();
+                // update recipe function(s) go here
+                break;
+            case '4':
+                System.out.println();
+                deleteRecipe(sc, conn);
+                break;
+            case '5':
+                inRecipeMenu = false;
+                System.out.println();
+                break;
+            default:
+                System.out.println("Invalid choice");
+            }
+        }
     }
 
     private static boolean doesUserExist(Connection conn, String username) {
@@ -168,7 +247,7 @@ public class RecipeDatabase {
         }
 
         try {
-            String query = "SELECT * FROM passwords WHERE password=?";
+            String query = "SELECT * FROM account WHERE password=?";
 
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, password);
@@ -226,6 +305,7 @@ public class RecipeDatabase {
                         System.out.println("Invalid input. Please enter valid input.");
                     } else {
                         isNotValidInput = false;
+                        System.out.println();
                         break;
                     }
 
@@ -239,24 +319,68 @@ public class RecipeDatabase {
         }
 
         // insert into account database and password database
-        String accountInsert = "INSERT INTO account VALUES(?,?,?,?)";
-        String passwordInsert = "INSERT INTO passwords VALUES(?,?)";
+        String accountInsert = "INSERT INTO account VALUES(?,?,?,?,?)";
+
         try {
             PreparedStatement stmt1 = conn.prepareStatement(accountInsert);
             stmt1.setString(1, username);
             stmt1.setString(2, email);
             stmt1.setString(3, dob);
             stmt1.setString(4, country);
+            stmt1.setString(5, password1);
             stmt1.execute();
-
-            PreparedStatement stmt2 = conn.prepareStatement(passwordInsert);
-            stmt2.setString(1, username);
-            stmt2.setString(2, password1);
-            stmt2.execute();
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void listRecipes(Connection conn) {
+        try {
+            Statement stmt = conn.createStatement();
+            String q = "SELECT * FROM recipe";
+            ResultSet rs = stmt.executeQuery(q);
+
+            while (rs.next()) {
+                int recid = rs.getInt("recipe_id");
+                String name = rs.getString("title");
+                Timestamp date = rs.getTimestamp("date_posted");
+                String strDate = parseDate(date);
+
+                Blob ingredients = rs.getBlob("ingredients");
+                byte[] blobIngrBytes = ingredients.getBytes(1, (int) ingredients.length());
+                String strIngr = new String(blobIngrBytes);
+
+                Blob instructions = rs.getBlob("instructions");
+                byte[] blobInstrBytes = instructions.getBytes(1, (int) instructions.length());
+                String strInstr = new String(blobInstrBytes);
+
+                System.out.println("(" + recid + "): " + name);
+                System.out.println("Date Posted: " + strDate);
+                System.out.println("Ingredients: " + strIngr);
+                System.out.println("Instructions:");
+                printInstructions(strInstr);
+
+                System.out.println();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Error in viewing recipes");
+        }
+    }
+
+    private static void printInstructions(String strInstr) {
+        String[] instructionInfo = strInstr.split("[,]+\\s+");
+
+        for (int i = 0; i < instructionInfo.length; i++) {
+            System.out.println("    " + instructionInfo[i]);
+        }
+    }
+
+    private static String parseDate(Timestamp date) {
+        String[] dateInfo = date.toString().split("[ ]+");
+        return dateInfo[0];
+    }
 
     }
 
