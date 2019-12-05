@@ -240,7 +240,7 @@ public class RecipeDatabase {
         try{
             Statement stmt = con.createStatement();
             ResultSet set = stmt.executeQuery("SELECT u.recipe_id, r.title FROM user_recipes u JOIN recipe r USING(recipe_id)" +
-                                    " WHERE username = 'Alice'");// replace Alice with currUser
+                                    " WHERE username = '" + currUser + "'");// replace Alice with currUser
 
             System.out.println("Your Recipes: ");
             while(set.next()) {
