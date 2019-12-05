@@ -134,7 +134,7 @@ public class RecipeDatabase {
                 break;
             case '2':
                 System.out.println();
-                createRecipeScreen(conn);
+                createRecipeScreen(sc, conn);
                 break;
             case '3':
                 updateRecipe(sc, conn);
@@ -217,7 +217,7 @@ public class RecipeDatabase {
         int postIdToCommentOn = sc.nextInt();
         String commendAddition = "INSERT INTO comments (username, recipe_id, comment) VALUES (?, ?, ?)";
         System.out.print("Enter your comment: ");
-        String strComment = ;
+        String strComment = "";
         try {
             byte[] byteContent = strComment.getBytes();
             Blob blob = conn.createBlob();
@@ -656,8 +656,7 @@ public class RecipeDatabase {
         }
     }
 
-    public static void createRecipeScreen(Connection conn) {
-        Scanner sc = new Scanner(System.in);
+    public static void createRecipeScreen(Scanner sc, Connection conn) {
         System.out.print("Enter recipe title: ");
         String title = sc.nextLine();
         System.out.print("Enter number of ingredients: ");
@@ -685,8 +684,28 @@ public class RecipeDatabase {
             System.out.println("Error: failed to add recipe");
             e.printStackTrace();
         }
-        // insert into food and
-        sc.close();
+        String lastInsertIdQuery = "SELECT LAST_INSERT_ID()";
+        int lastInsertId = -1;
+        try {
+            PreparedStatement stmt = conn.prepareStatement(lastInsertIdQuery);
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            lastInsertId = rs.getInt("LAST_INSERT_ID()");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error: last id failed");
+        }
+        // insert into user_recipe
+        String userRecipeInsert = "INSERT INTO user_recipes VALUES (?, ?)";
+        try {
+            PreparedStatement stmt = conn.prepareStatement(userRecipeInsert);
+            stmt.setString(1, currUser);
+            stmt.setInt(2, lastInsertId);
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Error: failed to add user_recipe");
+            e.printStackTrace();
+        }
     }
 
     public static void updateRecipe(Scanner sc, Connection con) {
