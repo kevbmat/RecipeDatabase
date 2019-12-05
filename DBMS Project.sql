@@ -73,6 +73,7 @@ INSERT INTO food VALUES
     ("Indian"),
     ("Japanese"),
     ("Italian"),
+    ("Mexican"),
     ("American");
 
 INSERT INTO account VALUES
@@ -85,6 +86,8 @@ INSERT INTO account VALUES
 
 INSERT INTO following VALUES
     ("Alice", "Bob"),
+    ("Alice", "Delta"),
+    ("Alice", "Charlie"),
     ("Charlie", "Bob"),
     ("Delta", "Bob"),
     ("Bob", "Alice"),
@@ -93,13 +96,17 @@ INSERT INTO following VALUES
 
 INSERT INTO recipe VALUES
     (1, "coleslaw", CURRENT_TIMESTAMP, FALSE, "cabbage, carrots, onions", "take everything and mix it"),
-    (2, "pasta", CURRENT_TIMESTAMP, TRUE, "pasta, sauce, cheese", "put it in the pot and cook"),
+    (2, "pasta", CURRENT_TIMESTAMP, TRUE, "pasta, sauce, cheese", "put it in the pot, and cook"),
     (3, "fried rice", CURRENT_TIMESTAMP, TRUE, "rice, peas, carrots", "fry the rice and mix all in"),
-    (4, "idli", CURRENT_TIMESTAMP, TRUE, "idli, chutney, sambar", "make batter then cook"),
+    (4, "idli", CURRENT_TIMESTAMP, TRUE, "idli, chutney, sambar", "make batter, then cook"),
     (5, "orange chicken", CURRENT_TIMESTAMP, TRUE, "chicken, curry, pepper", "get the chicken then add the pepper"),
     (6, "chow mein", CURRENT_TIMESTAMP, FALSE, "noodles, celery, pepper", "get the noodles and add everything else"),
     (7, "dosa", CURRENT_TIMESTAMP, TRUE, "dosa, sambar, chutney", "make the dosa, add the sambar"),
-    (8, "sushi", CURRENT_TIMESTAMP, FALSE, "rice, seaweed, fish", "put it together, eat it raw");
+    (8, "sushi", CURRENT_TIMESTAMP, FALSE, "rice, seaweed, fish", "put it together, eat it raw"),
+    (9, "burrito", CURRENT_TIMESTAMP, TRUE, "rice, beans, chicken, lettuce, chile verde, cheese", "cook all ingredients, put equal portions in, wrap burrito"),
+    (10, "pizza", CURRENT_TIMESTAMP, FALSE, "pizza dough, tomato sauce, pepperoni, sausage", "roll out dough, spread tomato sauce evenly on dough, sprinkle cheese, place pepperoni and sausage evenly."),
+    (11, "cheese burger", CURRENT_TIMESTAMP, FALSE, "burger, cheese, bun, ketchup", "grill burger to desired rareness, place cheese on burger until melted, take burger off grill and place on bun, squeeze ketchup on burger."),
+    (12, "fried chicken", CURRENT_TIMESTAMP, TRUE, "batter, chicken, oil", "heat oil, place chicken in batter, fry until crispy brown");
 
 INSERT INTO comments VALUES
     (1, "Alice", 5, "Needs more spice!"),
@@ -114,7 +121,8 @@ INSERT INTO recipe_type VALUES
     (5, "Chinese"),
     (6, "Chinese"),
     (7, "Indian"),
-    (8, "Japanese");
+    (8, "Japanese"),
+    (9, "Mexican");
 
 INSERT INTO user_recipes VALUES
     ("Alice", 1),
