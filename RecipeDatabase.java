@@ -137,6 +137,7 @@ public class RecipeDatabase {
                 createRecipeScreen(conn);
                 break;
             case '3':
+                createRecipeScreen(conn);
                 System.out.println();
                 break;
             case '4':
@@ -357,7 +358,6 @@ public class RecipeDatabase {
         if (password.equals("")) {
             return false;
         }
-
         try {
             String query = "SELECT * FROM account WHERE password=?";
 
@@ -560,6 +560,8 @@ public class RecipeDatabase {
             System.out.println("Error: failed to add recipe");
             e.printStackTrace();
         }
+        // insert into food and 
+        sc.close();
     }
 
     private static Connection connectToDB() {
