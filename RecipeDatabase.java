@@ -552,7 +552,7 @@ public class RecipeDatabase {
 
     private static void listNewsFeed(Connection conn) {
         try {
-            String q = "NEED TO GET NEWS FEED WORKING BOIIIII";
+            String q = "select r.title, r.ingredients, r.instructions, ur.username from recipe r NATURAL JOIN user_recipes ur JOIN following f ON (ur.username = f.account2) WHERE (f.account1 = "?")";
             PreparedStatement stmt = conn.prepareStatement(q);
             stmt.setString(1, currUser);
             ResultSet rs = stmt.executeQuery();
