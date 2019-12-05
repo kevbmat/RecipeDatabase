@@ -384,8 +384,35 @@ public class RecipeDatabase {
 
     }
 
-    private static void createRecipe() {
-        
+    private static void createRecipe(Connection conn) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter recipe title: ");
+        String title = sc.nextLine();
+        System.out.print("Enter number of ingredients: ");
+        int numIngredients = sc.nextInt();
+        StringBuilder ingredients = new StringBuilder();
+        System.out.println("Enter " + numIngredients + " ingredients:");
+        for (int i = 0; i <= numIngredients; i++) {
+            ingredients.append(sc.nextLine());
+        }
+        System.out.print("Enter number of instructions: ");
+        int numInstructions = sc.nextInt();
+        StringBuilder instructions = new StringBuilder();
+        System.out.println("Enter " + numInstructions + " instructions:");
+        for (int i = 0; i <= numInstructions; i++) {
+            instructions.append(sc.nextLine());
+        }
+        String recipeInsert = "INSERT INTO recipe (title, date_posted, view_flag, ingredients, instructions) VALUES (?, CURRENT_TIMESTAMP, TRUE, ?, ?)";
+        try {
+            PreparedStatement stmt = conn.prepareStatement(recipeInsert);
+            stmt.setString(1, title);
+            stmt.setString(2, ingredients.toString());
+            stmt.setString(3, instructions.toString());
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Error: failed to add recipe");
+            e.printStackTrace();
+        }
     }
 
     private static Connection connectToDB() {
