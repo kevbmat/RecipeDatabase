@@ -6,8 +6,6 @@ import java.sql.Date;
 
 import com.mysql.jdbc.Driver;
 
-//import jdk.internal.jshell.tool.Feedback.FormatErrors;
-
 public class RecipeDatabase {
     private static String currUser = "";
 
@@ -15,9 +13,17 @@ public class RecipeDatabase {
 
         Scanner userinput = new Scanner(System.in);
         Connection dbConn = connectToDB();
-        while (running) {
-            //introScreen(userinput, dbConn);
-            updateRecipe(dbConn, userinput);
+
+        boolean inIntroMenu = true;
+        while (inIntroMenu) {
+            int result = introScreen(userinput, dbConn);
+            if (result == 1) {
+                inIntroMenu = false;
+                break;
+            } else if (result == 3) {
+                System.out.println("Ending Program :)");
+                System.exit(0);
+            }
         }
 
         mainMenu(userinput, dbConn);
@@ -167,7 +173,7 @@ public class RecipeDatabase {
                 break;
             case '2':
                 System.out.println();
-
+                listTrending(sc, conn);
                 break;
             case '3':
                 System.out.println();
@@ -185,6 +191,29 @@ public class RecipeDatabase {
                 System.out.println("Invalid choice");
             }
         }
+    }
+
+    public static void listTrending(Scanner sc, Connection conn){
+        System.out.println("Trending User(s):");
+        String trending = "select username, COUNT(*) as number_of_recipes "+
+                            "from user_recipes "+
+                            "GROUP BY username "+
+                            "HAVING COUNT(*) = (select max(most_recipes) from "+
+                                "(select username, count(*) as most_recipes " +
+                                    "from user_recipes group by username) as sq)";
+
+        try{
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(trending);
+            while(rs.next())
+                System.out.println(rs.getString(1) + ": " + rs.getString(2));
+        }
+
+        catch (SQLException e){System.out.println(e);}
+        
+        System.out.println();
+        System.out.println();
+
     }
 
     private static boolean doesUserExist(Connection conn, String username) {
@@ -423,9 +452,8 @@ public class RecipeDatabase {
         return false;
     }
 
-    
     public static void createAccountScreen(Scanner sc, Connection conn) {
-/*
+
         boolean isNotValidInput = true;
         String username = "";
         String password1 = "";
@@ -528,7 +556,8 @@ public class RecipeDatabase {
 
         } catch (SQLException e) {
             e.printStackTrace();
-        }*/
+            System.out.println("Error in viewing recipes");
+        }
     }
 
     private static void printInstructions(String strInstr) {
@@ -647,48 +676,5 @@ public class RecipeDatabase {
 
         }
         return null;
-    }
-
-    public static void updateRecipe(Connection con, Scanner sc) {
-
-        System.out.println("Updating Recipe \n");
-
-        try{
-            Statement stmt = con.createStatement();
-            ResultSet set = stmt.executeQuery("SELECT u.recipe_id, r.title FROM user_recipes u JOIN recipe r USING(recipe_id)" +
-                                    " WHERE username = '" + currUser + "'");// replace Alice with currUser
-
-            System.out.println("Your Recipes: ");
-            while(set.next()) {
-                System.out.println(set.getString(1) + ": " + set.getString(2));
-            }
-        }
-        catch (SQLException e) {
-            System.out.println(e);
-            return;
-        }
-
-        System.out.print("\nWhich recipe would you like to update or change? Enter id number: ");
-        String choice = sc.nextLine().charAt(0);
-
-        //add input validation here, checking that choice is in the first column of ResultSet
-
-        System.out.print("\nPlease enter a new title: ");
-        String newTitle = sc.nextLine();
-
-        System.out.print("\nPlease enter new ingredients: ");
-        String newIngredients = sc.nextLine();
-
-        System.out.print("\nPlease enter new instructions: ");
-        String newInstructions = sc.nextLine();
-
-        String update = ("UPDATE recipe SET title= '" + newTitle + "', ingredients = '" + 
-                                newIngredients + "', instructions = '" + newInstructions + "' WHERE recipe_id = " + choice);
-
-        try{stmnt.executeQuery(update);}
-        catch(SQLException e){System.out.println(e);}
-
-
-
     }
 }
