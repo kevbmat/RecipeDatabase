@@ -163,6 +163,7 @@ public class RecipeDatabase {
             System.out.println("(2) View Trending Users");
             System.out.println("(3) Follow Someone");
             System.out.println("(4) Unfollow Someone");
+            System.out.println("(5) Return to Previous Menu");
 
             char input = sc.nextLine().charAt(0);
             switch (input) {
@@ -180,7 +181,7 @@ public class RecipeDatabase {
                 break;
             case '4':
                 System.out.println();
-
+                unfollowMenu(sc, conn);
                 break;
             case '5':
                 inSocialMenu = false;
@@ -220,7 +221,6 @@ public class RecipeDatabase {
                 + "FROM following " + "WHERE account1=? OR account2=?)";
 
         try {
-
             PreparedStatement stmt = conn.prepareStatement(query1);
             stmt.setString(1, currUser);
             stmt.setString(2, currUser);
@@ -262,6 +262,8 @@ public class RecipeDatabase {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+                System.out.println("Follow successful!");
+                System.out.println();
                 isNotValidInput = false;
                 break;
             } else {
@@ -286,6 +288,59 @@ public class RecipeDatabase {
             e.printStackTrace();
         }
         return false;
+    }
+
+    private static void unfollowMenu(Scanner sc, Connection conn) {
+        boolean isNotValidInput = true;
+        String query = "SELECT account2 FROM following WHERE account1=?";
+        try {
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, currUser);
+            ResultSet rs = stmt.executeQuery();
+
+            if (!rs.isBeforeFirst()) {
+                System.out.println("You are currently not following anyone!");
+                isNotValidInput = false;
+            } else {
+                System.out.println("You are currently following:");
+                while (rs.next()) {
+                    String name = rs.getString("account2");
+                    System.out.println(name);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println();
+
+        while (isNotValidInput) {
+            System.out.print("Please enter the name of the person you want to unfollow: ");
+            String answer = sc.nextLine();
+
+            if (answer.equals(currUser)) {
+                System.out.println("Error: You cannot unfollow yourself!");
+                System.out.println();
+            } else if (answer != "" && doesUserExist(conn, answer) && isAlreadyFollowing(conn, answer)) {
+                String query2 = "DELETE FROM following WHERE account1=? AND account2=?";
+                try {
+                    PreparedStatement stmt2 = conn.prepareStatement(query2);
+                    stmt2.setString(1, currUser);
+                    stmt2.setString(2, answer);
+                    stmt2.execute();
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("Unfollow successful!");
+                System.out.println();
+                isNotValidInput = false;
+                break;
+            } else {
+                System.out.println("Error: Invalid User!");
+                System.out.println();
+            }
+        }
     }
 
     private static void deleteRecipe(Scanner userinput, Connection conn) {
@@ -560,7 +615,7 @@ public class RecipeDatabase {
             System.out.println("Error: failed to add recipe");
             e.printStackTrace();
         }
-        // insert into food and 
+        // insert into food and
         sc.close();
     }
 
