@@ -601,7 +601,7 @@ public class RecipeDatabase {
     }
 
     private static void printInstructions(String strInstr) {
-        String[] instructionInfo = strInstr.split("[,]+\\s+");
+        String[] instructionInfo = strInstr.split("[,]+\\s*");
 
         for (int i = 0; i < instructionInfo.length; i++) {
             System.out.println("    " + instructionInfo[i]);
@@ -664,17 +664,17 @@ public class RecipeDatabase {
         int numIngredients = sc.nextInt();
         sc.nextLine();
         StringBuilder ingredients = new StringBuilder();
-        System.out.println("Enter " + numIngredients + " ingredients (comma separated):");
+        System.out.println("Enter " + numIngredients + " ingredients one at a time:");
         for (int i = 0; i < numIngredients; i++) {
-            ingredients.append(sc.nextLine());
+            ingredients.append(sc.nextLine() + ",");
         }
         System.out.print("Enter number of instructions: ");
         int numInstructions = sc.nextInt();
         sc.nextLine();
         StringBuilder instructions = new StringBuilder();
-        System.out.println("Enter " + numInstructions + " instructions (comma separated):");
+        System.out.println("Enter " + numInstructions + " instructions one at a time");
         for (int i = 0; i < numInstructions; i++) {
-            instructions.append(sc.nextLine());
+            instructions.append(sc.nextLine() + ",");
         }
         String recipeInsert = "INSERT INTO recipe (title, date_posted, view_flag, ingredients, instructions) VALUES (?, CURRENT_TIMESTAMP, TRUE, ?, ?)";
         try {
