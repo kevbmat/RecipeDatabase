@@ -134,6 +134,7 @@ public class RecipeDatabase {
                 break;
             case '2':
                 System.out.println();
+                createRecipeScreen(conn);
                 break;
             case '3':
                 System.out.println();
@@ -455,7 +456,7 @@ public class RecipeDatabase {
         }
     }
 
-    public static void createRecipeScreen() {
+    public static void createRecipeScreen(Connection conn) {
         Scanner sc = new Scanner(System.in);
         System.out.print("Enter recipe title: ");
         String title = sc.nextLine();
