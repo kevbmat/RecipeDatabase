@@ -134,18 +134,54 @@ public class RecipeDatabase {
                 break;
             case '2':
                 System.out.println();
-                // add recipe function(s) go here
                 break;
             case '3':
                 System.out.println();
-                // update recipe function(s) go here
                 break;
             case '4':
                 System.out.println();
-                deleteRecipe(sc, conn);
+
                 break;
             case '5':
                 inRecipeMenu = false;
+                System.out.println();
+                break;
+            default:
+                System.out.println("Invalid choice");
+            }
+        }
+    }
+
+    private static void socialMenu(Scanner sc, Connection conn) {
+        boolean inSocialMenu = true;
+
+        while (inSocialMenu) {
+            System.out.println("Select option below");
+            System.out.println("(1) News Feed");
+            System.out.println("(2) View Trending Users");
+            System.out.println("(3) Follow Someone");
+            System.out.println("(4) Unfollow Someone");
+
+            char input = sc.nextLine().charAt(0);
+            switch (input) {
+            case '1':
+                System.out.println();
+                listNewsFeed(conn);
+                break;
+            case '2':
+                System.out.println();
+
+                break;
+            case '3':
+                System.out.println();
+
+                break;
+            case '4':
+                System.out.println();
+
+                break;
+            case '5':
+                inSocialMenu = false;
                 System.out.println();
                 break;
             default:
@@ -336,9 +372,10 @@ public class RecipeDatabase {
 
     public static void listRecipes(Connection conn) {
         try {
-            Statement stmt = conn.createStatement();
-            String q = "SELECT * FROM recipe";
-            ResultSet rs = stmt.executeQuery(q);
+            String q = "SELECT * " + "FROM recipe r JOIN user_recipes ur USING(recipe_id) " + "WHERE username=?";
+            PreparedStatement stmt = conn.prepareStatement(q);
+            stmt.setString(1, currUser);
+            ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 int recid = rs.getInt("recipe_id");
@@ -380,6 +417,42 @@ public class RecipeDatabase {
     private static String parseDate(Timestamp date) {
         String[] dateInfo = date.toString().split("[ ]+");
         return dateInfo[0];
+    }
+
+    private static void listNewsFeed(Connection conn) {
+        try {
+            String q = "NEED TO GET NEWS FEED WORKING BOIIIII";
+            PreparedStatement stmt = conn.prepareStatement(q);
+            stmt.setString(1, currUser);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                int recid = rs.getInt("recipe_id");
+                String name = rs.getString("title");
+                Timestamp date = rs.getTimestamp("date_posted");
+                String strDate = parseDate(date);
+
+                Blob ingredients = rs.getBlob("ingredients");
+                byte[] blobIngrBytes = ingredients.getBytes(1, (int) ingredients.length());
+                String strIngr = new String(blobIngrBytes);
+
+                Blob instructions = rs.getBlob("instructions");
+                byte[] blobInstrBytes = instructions.getBytes(1, (int) instructions.length());
+                String strInstr = new String(blobInstrBytes);
+
+                System.out.println("(" + recid + "): " + name);
+                System.out.println("Date Posted: " + strDate);
+                System.out.println("Ingredients: " + strIngr);
+                System.out.println("Instructions:");
+                printInstructions(strInstr);
+
+                System.out.println();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Error in viewing recipes");
+        }
     }
 
     public static void createRecipeScreen() {
