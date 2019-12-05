@@ -131,10 +131,11 @@ public class RecipeDatabase {
             case '1':
                 System.out.println();
                 listRecipes(conn);
+                System.out.println();
                 break;
             case '2':
-                System.out.println();
                 createRecipeScreen(sc, conn);
+                System.out.println();
                 break;
             case '3':
                 updateRecipe(sc, conn);
@@ -666,7 +667,11 @@ public class RecipeDatabase {
         StringBuilder ingredients = new StringBuilder();
         System.out.println("Enter " + numIngredients + " ingredients one at a time:");
         for (int i = 0; i < numIngredients; i++) {
-            ingredients.append(sc.nextLine() + ",");
+            if (i == numIngredients - 1) {
+                ingredients.append(sc.nextLine());
+            } else {
+                ingredients.append(sc.nextLine() + ",");
+            }
         }
         System.out.print("Enter number of instructions: ");
         int numInstructions = sc.nextInt();
@@ -674,7 +679,7 @@ public class RecipeDatabase {
         StringBuilder instructions = new StringBuilder();
         System.out.println("Enter " + numInstructions + " instructions one at a time");
         for (int i = 0; i < numInstructions; i++) {
-            instructions.append(sc.nextLine() + ",");
+            instructions.append(sc.nextLine() + ", ");
         }
         String recipeInsert = "INSERT INTO recipe (title, date_posted, view_flag, ingredients, instructions) VALUES (?, CURRENT_TIMESTAMP, TRUE, ?, ?)";
         try {
