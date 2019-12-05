@@ -1,4 +1,3 @@
-
 /**
  * This program is a recipe social network which leverages the cpsc321_groupC_DB on the cps-database at Gonzaga University
  * @author: Cole deSilva, Andrew Flagstead, Kevin Mattappally, Brandon Clark
@@ -388,8 +387,9 @@ public class RecipeDatabase {
             }
         }
     }
-
+//function to determine if a user is already following another user
     private static boolean isAlreadyFollowing(Connection conn, String name) {
+        //sets up query to determine if the current user who is signed in is following another account and what account it is.
         String query = "SELECT * FROM following WHERE account1=? AND account2=?";
         try {
             PreparedStatement stmt = conn.prepareStatement(query);
@@ -405,15 +405,16 @@ public class RecipeDatabase {
         }
         return false;
     }
-
+//function menu to unfollow a user. Will run if user chooses to unfollow someone.
     private static void unfollowMenu(Scanner sc, Connection conn) {
         boolean isNotValidInput = true;
+        //sets up query to determine who you are following
         String query = "SELECT account2 FROM following WHERE account1=?";
         try {
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, currUser);
             ResultSet rs = stmt.executeQuery();
-
+// check to ensure they are following anyone. If they are following people, that list will be outputted.
             if (!rs.isBeforeFirst()) {
                 System.out.println("You are currently not following anyone!");
                 isNotValidInput = false;
@@ -433,11 +434,12 @@ public class RecipeDatabase {
         while (isNotValidInput) {
             System.out.print("Please enter the name of the person you want to unfollow: ");
             String answer = sc.nextLine();
-
+//catch cases to ensure it happens only if possible
             if (answer.equals(currUser)) {
                 System.out.println("Error: You cannot unfollow yourself!");
                 System.out.println();
             } else if (answer != "" && doesUserExist(conn, answer) && isAlreadyFollowing(conn, answer)) {
+                //setting up query to delete from database
                 String query2 = "DELETE FROM following WHERE account1=? AND account2=?";
                 try {
                     PreparedStatement stmt2 = conn.prepareStatement(query2);
@@ -458,11 +460,12 @@ public class RecipeDatabase {
             }
         }
     }
-
+//function to delete recipes based on user input
     private static void deleteRecipe(Scanner userinput, Connection conn) {
+        //bool to validate if it is or is not a valid input.
         boolean isNotValidInput = true;
         int recipeId = 0;
-
+//validation of it is a valid recipe to be deleted 
         while (isNotValidInput) {
             System.out.print("Please enter the id of the recipe to be deleted: ");
             try {
@@ -478,7 +481,7 @@ public class RecipeDatabase {
                 System.out.println("Please enter an integer");
             }
         }
-
+         // queries to delete recipe from user_recipes and recipe table
         // String query1 = "DELETE FROM recipe_type WHERE recipe_id=?";
         String query2 = "DELETE FROM user_recipes WHERE recipe_id=?";
         String query3 = "DELETE FROM recipe WHERE recipe_id=?";
@@ -487,11 +490,11 @@ public class RecipeDatabase {
             // PreparedStatement stmt1 = conn.prepareStatement(query1);
             // stmt1.setInt(1, recipeId);
             // stmt1.execute();
-
+            //executing the queries to delete recipes from the two tables
             PreparedStatement stmt2 = conn.prepareStatement(query2);
             stmt2.setInt(1, recipeId);
             stmt2.execute();
-
+            //setting the values and executing the query to delte the recipes
             PreparedStatement stmt3 = conn.prepareStatement(query3);
             stmt3.setInt(1, recipeId);
             stmt3.execute();
@@ -502,18 +505,19 @@ public class RecipeDatabase {
         }
 
     }
-
+//validation of if the recipe id is valid or not
     private static boolean isValidRecipeId(int id, Connection conn) {
         if (id <= 0) {
             return false;
         }
 
         try {
+            //query to find recipes with a given recipe id
             String query = "SELECT * FROM recipe WHERE recipe_id=?";
-
+             //setting 
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setInt(1, id);
-
+            //creating result set 
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return true;
@@ -524,17 +528,19 @@ public class RecipeDatabase {
         return false;
 
     }
-
+    //validation that twopasswords are equal when creating account
     private static boolean isValidPassword(Connection conn, String password) {
         if (password.equals("")) {
             return false;
         }
         try {
+            //setting up query to find password from account
             String query = "SELECT * FROM account WHERE password=?";
-
+            //setting up prepared statement for query
             PreparedStatement stmt = conn.prepareStatement(query);
+            //setting values for password
             stmt.setString(1, password);
-
+            //creating result set and executing query
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return true;
@@ -544,19 +550,19 @@ public class RecipeDatabase {
         }
         return false;
     }
-
+    //create account screen
     public static void createAccountScreen(Scanner sc, Connection conn) {
-
+        //declartation of values to be entered 
         boolean isNotValidInput = true;
         String username = "";
         String password1 = "";
         String email = "";
         String country = "";
         String dob = "";
-
+        //validation that input works
         while (isNotValidInput) {
             Console console = System.console();
-
+            //outputting request for values ot be inputted and having user enter them
             System.out.println("ACCOUNT CREATION:");
             System.out.print("Enter username: ");
             username = console.readLine();
@@ -581,21 +587,23 @@ public class RecipeDatabase {
 
                     System.out.print("Enter country residence: ");
                     country = console.readLine();
-
+                    //validating passwords entered are equal to one another
                     if ((username.equals("") || password1.equals("") || email.equals("") || country.equals("")
                             || dob.equals(""))
                             || (username.length() > 30 || password1.length() > 30 || country.length() > 2)) {
                         System.out.println("Invalid input. Please enter valid input.");
-                    } else {
+                    } 
+                    //excutes granted all values are valid
+                    else {
                         isNotValidInput = false;
                         System.out.println();
                         break;
                     }
-
+                //output if passwords do not match
                 } else {
                     System.out.println("Your passwords do not match! Try again!");
                 }
-
+                //outputs if user trys to create an account when one already exists
             } else {
                 System.out.println("That user already exists! Try again!");
             }
