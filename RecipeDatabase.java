@@ -3,7 +3,7 @@ import java.io.*;
 import java.nio.charset.MalformedInputException;
 import java.sql.*;
 import java.sql.Date;
-
+import java.util.Scanner;
 import com.mysql.jdbc.Driver;
 
 public class RecipeDatabase {
@@ -215,23 +215,25 @@ public class RecipeDatabase {
         }
         System.out.print("Enter an id to comment on: ");
         int postIdToCommentOn = sc.nextInt();
-        String commendAddition = "INSERT INTO comments (username, recipe_id, comment) VALUES (?, ?, ?)";
+        sc.nextLine();
         System.out.print("Enter your comment: ");
-        String strComment = "";
+        String strComment = sc.nextLine();
+        String commentAddition = "INSERT INTO comments (username, recipe_id, comment) VALUES (?, ?, ?)";
         try {
             byte[] byteContent = strComment.getBytes();
             Blob blob = conn.createBlob();
             blob.setBytes(1, byteContent);
-            PreparedStatement stmtComment = conn.prepareStatement(commendAddition);
+            PreparedStatement stmtComment = conn.prepareStatement(commentAddition);
             stmtComment.setString(1, currUser);
             stmtComment.setInt(2, postIdToCommentOn);
-            stmtComment.setBlob(3, blob);
+            stmtComment.setString(3, strComment);
             stmtComment.executeUpdate();
         } catch (Exception e) {
             System.out.println("Error: failed to add comment");
             e.printStackTrace();
         }
     }
+
     public static void listTrending(Scanner sc, Connection conn){
         System.out.println("Trending User(s):");
         String trending = "select username, COUNT(*) as number_of_recipes "+
