@@ -102,7 +102,7 @@ public class RecipeDatabase {
                 break;
             case '2':
                 System.out.println();
-                // socialMenu(sc, conn);
+                socialMenu(sc, conn);
                 break;
             case '3':
                 inMainMenu = false;
@@ -175,7 +175,7 @@ public class RecipeDatabase {
                 break;
             case '3':
                 System.out.println();
-
+                followMenu(sc, conn);
                 break;
             case '4':
                 System.out.println();
@@ -203,6 +203,81 @@ public class RecipeDatabase {
             stmt.setString(1, username);
 
             ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private static void followMenu(Scanner sc, Connection conn) {
+        boolean isNotValidInput = true;
+        // finding everyone that the person does not follow
+        String query1 = "SELECT DISTINCT account2 " + "FROM following " + "WHERE account2 NOT IN (SELECT account2 "
+                + "FROM following " + "WHERE account1=? OR account2=?)";
+
+        try {
+
+            PreparedStatement stmt = conn.prepareStatement(query1);
+            stmt.setString(1, currUser);
+            stmt.setString(2, currUser);
+
+            ResultSet rs = stmt.executeQuery();
+            if (!rs.isBeforeFirst()) {
+                System.out.println("You already follow everyone!");
+                isNotValidInput = false;
+            } else {
+                System.out.println("You are currently not following:");
+                while (rs.next()) {
+                    String name = rs.getString("account2");
+                    System.out.println(name);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println();
+
+        while (isNotValidInput) {
+            System.out.print("Please enter the name of the person you want to follow: ");
+            String answer = sc.nextLine();
+
+            if (answer.equals(currUser)) {
+                System.out.println("Error: You cannot follow yourself!");
+                System.out.println();
+            } else if (isAlreadyFollowing(conn, answer)) {
+                System.out.println("Error: You cannot follow someone youre already following!");
+                System.out.println();
+            } else if (answer != "" && doesUserExist(conn, answer)) {
+                String query2 = "INSERT INTO following VALUES(?,?)";
+                try {
+                    PreparedStatement stmt2 = conn.prepareStatement(query2);
+                    stmt2.setString(1, currUser);
+                    stmt2.setString(2, answer);
+                    stmt2.execute();
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                isNotValidInput = false;
+                break;
+            } else {
+                System.out.println("Error: Invalid User!");
+                System.out.println();
+            }
+        }
+    }
+
+    private static boolean isAlreadyFollowing(Connection conn, String name) {
+        String query = "SELECT * FROM following WHERE account1=? AND account2=?";
+        try {
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, currUser);
+            stmt.setString(2, name);
+            ResultSet rs = stmt.executeQuery();
+
             if (rs.next()) {
                 return true;
             }
