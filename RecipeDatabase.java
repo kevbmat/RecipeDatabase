@@ -426,14 +426,14 @@ public class RecipeDatabase {
             }
         }
 
-        String query1 = "DELETE FROM recipe_type WHERE recipe_id=?";
+        // String query1 = "DELETE FROM recipe_type WHERE recipe_id=?";
         String query2 = "DELETE FROM user_recipes WHERE recipe_id=?";
         String query3 = "DELETE FROM recipe WHERE recipe_id=?";
 
         try {
-            PreparedStatement stmt1 = conn.prepareStatement(query1);
-            stmt1.setInt(1, recipeId);
-            stmt1.execute();
+            // PreparedStatement stmt1 = conn.prepareStatement(query1);
+            // stmt1.setInt(1, recipeId);
+            // stmt1.execute();
 
             PreparedStatement stmt2 = conn.prepareStatement(query2);
             stmt2.setInt(1, recipeId);
