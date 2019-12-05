@@ -137,12 +137,12 @@ public class RecipeDatabase {
                 createRecipeScreen(conn);
                 break;
             case '3':
-                createRecipeScreen(conn);
+                updateRecipe(sc, conn);
                 System.out.println();
                 break;
             case '4':
+                deleteRecipe(sc, conn);
                 System.out.println();
-
                 break;
             case '5':
                 inRecipeMenu = false;
@@ -163,7 +163,8 @@ public class RecipeDatabase {
             System.out.println("(2) View Trending Users");
             System.out.println("(3) Follow Someone");
             System.out.println("(4) Unfollow Someone");
-            System.out.println("(5) Return to Previous Menu");
+            System.out.println("(5) Add comment");
+            System.out.println("(6) Return to Previous Menu");
 
             char input = sc.nextLine().charAt(0);
             switch (input) {
@@ -184,6 +185,9 @@ public class RecipeDatabase {
                 unfollowMenu(sc, conn);
                 break;
             case '5':
+                System.out.println();
+                addComment(sc, conn);
+            case '6':
                 inSocialMenu = false;
                 System.out.println();
                 break;
@@ -193,6 +197,33 @@ public class RecipeDatabase {
         }
     }
 
+    public static void addComment(Scanner sc, Connection conn) {
+        String query = "SELECT r.recipe_id, r.title, ur.username AS post_user FROM recipe r NATURAL JOIN user_recipes ur JOIN following f ON (ur.username = f.account2) WHERE (f.account1 = ?) ORDER BY r.recipe_id DESC";
+        stmt.setString(1, currUser);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            int recipe_id = rs.getInt("recipe_id");
+            String title = rs.getString("title");
+            String post_user = rs.getString("post_user");
+            System.out.println("(" + recipe_id + ")" + title + "by " + post_user);
+        }
+        System.out.print("Enter an id to comment on: ");
+        int postIdToCommentOn = sc.nextInt();
+        String commentAddition = "";
+        String commendAddition = "INSERT INTO comment (username, recipe_id, comment) VALUES (?, ?, ?)";
+        System.out.println("Enter your comment: ");
+        Blob comment = sc.nextLine();
+        try {
+            PreparedStatement stmt = conn.prepareStatement(recipeInsert);
+            stmt.setString(1, currUser);
+            stmt.setInt(2, postIdToCommentOn);
+            stmt.setBlob(3, comment);
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Error: failed to add recipe");
+            e.printStackTrace();
+        }
+    }
     public static void listTrending(Scanner sc, Connection conn){
         System.out.println("Trending User(s):");
         String trending = "select username, COUNT(*) as number_of_recipes "+
@@ -649,6 +680,37 @@ public class RecipeDatabase {
         }
         // insert into food and
         sc.close();
+    }
+
+    public static void updateRecipe(Connection con, Scanner sc) {
+        System.out.println("Updating Recipe \n");
+        try{
+            Statement stmt = con.createStatement();
+            ResultSet set = stmt.executeQuery("SELECT u.recipe_id, r.title FROM user_recipes u JOIN recipe r USING(recipe_id)" +
+                                    " WHERE username = '" + currUser + "'");// replace Alice with currUser
+
+            System.out.println("Your Recipes: ");
+            while(set.next()) {
+                System.out.println(set.getString(1) + ": " + set.getString(2));
+            }
+        }
+        catch (SQLException e) {
+            System.out.println(e);
+            return;
+        }
+        System.out.print("\nWhich recipe would you like to update or change? Enter id number: ");
+        String choice = sc.nextLine().charAt(0);
+        //add input validation here, checking that choice is in the first column of ResultSet
+        System.out.print("\nPlease enter a new title: ");
+        String newTitle = sc.nextLine();
+        System.out.print("\nPlease enter new ingredients: ");
+        String newIngredients = sc.nextLine();
+        System.out.print("\nPlease enter new instructions: ");
+        String newInstructions = sc.nextLine();
+        String update = ("UPDATE recipe SET title= '" + newTitle + "', ingredients = '" + 
+                                newIngredients + "', instructions = '" + newInstructions + "' WHERE recipe_id = " + choice);
+        try{stmnt.executeQuery(update);}
+        catch(SQLException e){System.out.println(e);}
     }
 
     private static Connection connectToDB() {
