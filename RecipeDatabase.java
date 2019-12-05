@@ -134,6 +134,7 @@ public class RecipeDatabase {
                 break;
             case '2':
                 System.out.println();
+                createRecipeScreen(conn);
                 break;
             case '3':
                 createRecipeScreen(conn);
