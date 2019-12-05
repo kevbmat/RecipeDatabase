@@ -552,34 +552,32 @@ public class RecipeDatabase {
 
     private static void listNewsFeed(Connection conn) {
         try {
-            String q = "select r.title, r.ingredients, r.instructions, ur.username from recipe r NATURAL JOIN user_recipes ur JOIN following f ON (ur.username = f.account2) WHERE (f.account1 = "?")";
-            PreparedStatement stmt = conn.prepareStatement(q);
+            String query = "SELECT r.recipe_id, r.title, r.ingredients, r.instructions, ur.username AS post_user FROM recipe r NATURAL JOIN user_recipes ur JOIN following f ON (ur.username = f.account2) WHERE (f.account1 = ?) ORDER BY r.recipe_id DESC";
+            String commentQuery = "SELECT c.username, c.comment FROM comments c WHERE recipe_id = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, currUser);
             ResultSet rs = stmt.executeQuery();
-
+            HashMap<Integer, ArrayList<String>> recipeToComments = new HashMap<>();
             while (rs.next()) {
-                int recid = rs.getInt("recipe_id");
-                String name = rs.getString("title");
-                Timestamp date = rs.getTimestamp("date_posted");
-                String strDate = parseDate(date);
-
+                int recipe_id = rs.getInt("recipe_id");
+                String title = rs.getString("title");
                 Blob ingredients = rs.getBlob("ingredients");
+                Blob instructions = rs.getBlob("instructions");
+                String post_user = rs.getString("post_user");
+                String comment_user = rs.getString("comment_user");
+                Blob comment = rs.getBlob("comment");
+                // Timestamp date = rs.getTimestamp("date_posted");
+                // String strDate = parseDate(date);
                 byte[] blobIngrBytes = ingredients.getBytes(1, (int) ingredients.length());
                 String strIngr = new String(blobIngrBytes);
-
-                Blob instructions = rs.getBlob("instructions");
                 byte[] blobInstrBytes = instructions.getBytes(1, (int) instructions.length());
                 String strInstr = new String(blobInstrBytes);
-
-                System.out.println("(" + recid + "): " + name);
-                System.out.println("Date Posted: " + strDate);
+                System.out.println(post_user + ": " + title);
                 System.out.println("Ingredients: " + strIngr);
-                System.out.println("Instructions:");
+                System.out.println("Instructions: ");
                 printInstructions(strInstr);
-
                 System.out.println();
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Error in viewing recipes");
