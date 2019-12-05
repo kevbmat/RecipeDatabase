@@ -564,8 +564,17 @@ public class RecipeDatabase {
                 Blob ingredients = rs.getBlob("ingredients");
                 Blob instructions = rs.getBlob("instructions");
                 String post_user = rs.getString("post_user");
-                String comment_user = rs.getString("comment_user");
-                Blob comment = rs.getBlob("comment");
+                PreparedStatement commentStmt = conn.prepareStatement(commentQuery);
+                commentStmt.setInt(1, recipe_id);
+                ResultSet commentRs = commentStmt.executeQuery();
+                StringBuilder comments = new StringBuilder();
+                while (commentRs.next()) {
+                    String commentUsername = commentRs.getString("username");
+                    Blob commentBody = commentRs.getBlob("comment");
+                    byte[] blobCommmentBodyBytes = commentBody.getBytes(1, (int) commentBody.length());
+                    String stringCommentBody = new String(blobCommmentBodyBytes);
+                    comments.append(commentUsername + ": " + stringCommentBody + "\n");
+                }
                 // Timestamp date = rs.getTimestamp("date_posted");
                 // String strDate = parseDate(date);
                 byte[] blobIngrBytes = ingredients.getBytes(1, (int) ingredients.length());
@@ -576,6 +585,8 @@ public class RecipeDatabase {
                 System.out.println("Ingredients: " + strIngr);
                 System.out.println("Instructions: ");
                 printInstructions(strInstr);
+                System.out.println("---Comment section---");
+                System.out.println(comments.toString());
                 System.out.println();
             }
         } catch (SQLException e) {
