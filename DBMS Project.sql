@@ -111,7 +111,16 @@ INSERT INTO recipe VALUES
 INSERT INTO comments VALUES
     (1, "Alice", 5, "Needs more spice!"),
     (2, "Delta", 3, "Where is the egg?"),
-    (3, "Charlie", 4, "Do you fry?");
+    (3, "Charlie", 4, "Do you fry?"),
+    (4, 'Charlie', 1, 'My grandparents hated it'),
+    (5, 'Alice', 1, 'block party success because of this'),
+    (6, 'Delta', 1, 'my friends love me now'),
+    (7, 'Bob', 1, 'just like panda'),
+    (8, 'Charlie', 8, 'so authentic, i love it'),
+    (9, 'Bob', 1, 'Coleslaw Dude!'),
+    (10, 'Delta', 1, 'I love this'),
+    (11, 'Charlie', 2, 'Very italian'),
+    (12, 'Alice', 3, 'OMG so delicious XD');
 
 INSERT INTO recipe_type VALUES
     (1, "American"),
