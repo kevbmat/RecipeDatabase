@@ -624,7 +624,12 @@ public class RecipeDatabase {
             e.printStackTrace();
         }
     }
-
+    
+    /**
+     * lists out each of the recipes that the user has made
+     * doesn't include recipes that the user is following
+     * @param conn
+     */
     public static void listRecipes(Connection conn) {
         try {
             String q = "SELECT * " + "FROM recipe r JOIN user_recipes ur USING(recipe_id) " + "WHERE username=?";
@@ -661,6 +666,11 @@ public class RecipeDatabase {
         }
     }
 
+    /**
+     * prints out each of the recipe instructions
+     * in a nicely formatted fashion
+     * @param strInstr
+     */
     private static void printInstructions(String strInstr) {
         String[] instructionInfo = strInstr.split("[,]+\\s*");
 
@@ -669,11 +679,22 @@ public class RecipeDatabase {
         }
     }
 
+    /**
+     * parses the date from SQL into a String format
+     * @param date
+     * @return a String that represents the given date
+     */
     private static String parseDate(Timestamp date) {
         String[] dateInfo = date.toString().split("[ ]+");
         return dateInfo[0];
     }
 
+    /**
+     * prints out the news feed in the application
+     * shows recipes and recipe comments for each user
+     * that the current user is following
+     * @param conn
+     */
     private static void listNewsFeed(Connection conn) {
         try {
             String query = "SELECT r.recipe_id, r.title, r.ingredients, r.instructions, ur.username AS post_user FROM recipe r NATURAL JOIN user_recipes ur JOIN following f ON (ur.username = f.account2) WHERE (f.account1 = ?) ORDER BY r.recipe_id DESC";
@@ -718,6 +739,11 @@ public class RecipeDatabase {
         }
     }
 
+    /**
+     * allows the user to enter their own recipe into the application
+     * @param sc
+     * @param conn
+     */
     public static void createRecipeScreen(Scanner sc, Connection conn) {
         System.out.print("Enter recipe title: ");
         String title = sc.nextLine();
@@ -776,6 +802,11 @@ public class RecipeDatabase {
         }
     }
 
+    /**
+     * allows users to update any of their current recipes in the application
+     * @param sc
+     * @param con
+     */
     public static void updateRecipe(Scanner sc, Connection con) {
         System.out.println("Updating Recipe \n");
 
@@ -820,6 +851,12 @@ public class RecipeDatabase {
 
     }
 
+    /**
+     * checks whether the given recipe id is a valid updatable recipe
+     * @param id
+     * @param conn
+     * @return either true or false depending on if the id is a valid recipe id
+     */
     private static boolean isUpdatableRecipe(int id, Connection conn) {
         String query = "SELECT u.recipe_id " + "FROM user_recipes u JOIN recipe r USING(recipe_id) "
                 + "WHERE u.username=? AND u.recipe_id=?";
@@ -838,6 +875,11 @@ public class RecipeDatabase {
         return false;
     }
 
+    /**
+     * method that makes the initial connection to the database
+     * @return a Connection that can be used within the rest of 
+     * the application to process queries and updates
+     */
     private static Connection connectToDB() {
         boolean isNotValidInput = true;
 
