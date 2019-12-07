@@ -1,3 +1,4 @@
+
 /**
  * This program is a recipe social network which leverages the cpsc321_groupC_DB on the cps-database at Gonzaga University
  * @author: Cole deSilva, Andrew Flagstead, Kevin Mattappally, Brandon Clark
@@ -249,6 +250,13 @@ public class RecipeDatabase {
         }
     }
 
+    /**
+     * function to add a comment to a specific recipe. first lists recipes you can
+     * comment on, then prompts user to add a comment.
+     * 
+     * @param sc
+     * @param conn
+     */
     public static void addComment(Scanner sc, Connection conn) {
         try {
             String query = "SELECT r.recipe_id, r.title, ur.username AS post_user FROM recipe r NATURAL JOIN user_recipes ur JOIN following f ON (ur.username = f.account2) WHERE (f.account1 = ?) ORDER BY r.recipe_id DESC";
@@ -286,6 +294,13 @@ public class RecipeDatabase {
         }
     }
 
+    /**
+     * function to list the trending user(s) a trending user is the person or people
+     * with the most ammount of posted recipes.
+     * 
+     * @param sc
+     * @param conn
+     */
     public static void listTrending(Scanner sc, Connection conn) {
         System.out.println("Trending User(s):");
         String trending = "select username, COUNT(*) as number_of_recipes " + "from user_recipes "
@@ -308,6 +323,13 @@ public class RecipeDatabase {
 
     }
 
+    /**
+     * checks to see if a specific user actually exists in the DB currently
+     * 
+     * @param conn
+     * @param username
+     * @return
+     */
     private static boolean doesUserExist(Connection conn, String username) {
         if (username.equals("")) {
             return false;
@@ -329,6 +351,13 @@ public class RecipeDatabase {
         return false;
     }
 
+    /**
+     * functionality for following another user first prints the users that the
+     * current user is not following the prompts them to follow someone
+     * 
+     * @param sc
+     * @param conn
+     */
     private static void followMenu(Scanner sc, Connection conn) {
         boolean isNotValidInput = true;
         // finding everyone that the person does not follow
@@ -387,9 +416,11 @@ public class RecipeDatabase {
             }
         }
     }
-//function to determine if a user is already following another user
+
+    // function to determine if a user is already following another user
     private static boolean isAlreadyFollowing(Connection conn, String name) {
-        //sets up query to determine if the current user who is signed in is following another account and what account it is.
+        // sets up query to determine if the current user who is signed in is following
+        // another account and what account it is.
         String query = "SELECT * FROM following WHERE account1=? AND account2=?";
         try {
             PreparedStatement stmt = conn.prepareStatement(query);
@@ -405,16 +436,24 @@ public class RecipeDatabase {
         }
         return false;
     }
-//function menu to unfollow a user. Will run if user chooses to unfollow someone.
+
+    /**
+     * function menu to unfollow a user. Will run if user chooses to unfollow
+     * someone.
+     * 
+     * @param sc
+     * @param conn
+     */
     private static void unfollowMenu(Scanner sc, Connection conn) {
         boolean isNotValidInput = true;
-        //sets up query to determine who you are following
+        // sets up query to determine who you are following
         String query = "SELECT account2 FROM following WHERE account1=?";
         try {
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, currUser);
             ResultSet rs = stmt.executeQuery();
-// check to ensure they are following anyone. If they are following people, that list will be outputted.
+            // check to ensure they are following anyone. If they are following people, that
+            // list will be outputted.
             if (!rs.isBeforeFirst()) {
                 System.out.println("You are currently not following anyone!");
                 isNotValidInput = false;
@@ -434,12 +473,12 @@ public class RecipeDatabase {
         while (isNotValidInput) {
             System.out.print("Please enter the name of the person you want to unfollow: ");
             String answer = sc.nextLine();
-//catch cases to ensure it happens only if possible
+            // catch cases to ensure it happens only if possible
             if (answer.equals(currUser)) {
                 System.out.println("Error: You cannot unfollow yourself!");
                 System.out.println();
             } else if (answer != "" && doesUserExist(conn, answer) && isAlreadyFollowing(conn, answer)) {
-                //setting up query to delete from database
+                // setting up query to delete from database
                 String query2 = "DELETE FROM following WHERE account1=? AND account2=?";
                 try {
                     PreparedStatement stmt2 = conn.prepareStatement(query2);
@@ -460,12 +499,18 @@ public class RecipeDatabase {
             }
         }
     }
-//function to delete recipes based on user input
+
+    /**
+     * function to delete recipes based on user input
+     * 
+     * @param userinput
+     * @param conn
+     */
     private static void deleteRecipe(Scanner userinput, Connection conn) {
-        //bool to validate if it is or is not a valid input.
+        // bool to validate if it is or is not a valid input.
         boolean isNotValidInput = true;
         int recipeId = 0;
-//validation of it is a valid recipe to be deleted 
+        // validation of it is a valid recipe to be deleted
         while (isNotValidInput) {
             System.out.print("Please enter the id of the recipe to be deleted: ");
             try {
@@ -481,7 +526,7 @@ public class RecipeDatabase {
                 System.out.println("Please enter an integer");
             }
         }
-         // queries to delete recipe from user_recipes and recipe table
+        // queries to delete recipe from user_recipes and recipe table
         // String query1 = "DELETE FROM recipe_type WHERE recipe_id=?";
         String query2 = "DELETE FROM user_recipes WHERE recipe_id=?";
         String query3 = "DELETE FROM recipe WHERE recipe_id=?";
@@ -490,11 +535,11 @@ public class RecipeDatabase {
             // PreparedStatement stmt1 = conn.prepareStatement(query1);
             // stmt1.setInt(1, recipeId);
             // stmt1.execute();
-            //executing the queries to delete recipes from the two tables
+            // executing the queries to delete recipes from the two tables
             PreparedStatement stmt2 = conn.prepareStatement(query2);
             stmt2.setInt(1, recipeId);
             stmt2.execute();
-            //setting the values and executing the query to delte the recipes
+            // setting the values and executing the query to delte the recipes
             PreparedStatement stmt3 = conn.prepareStatement(query3);
             stmt3.setInt(1, recipeId);
             stmt3.execute();
@@ -505,19 +550,26 @@ public class RecipeDatabase {
         }
 
     }
-//validation of if the recipe id is valid or not
+
+    /**
+     * validation of if the recipe id is valid or not
+     * 
+     * @param id
+     * @param conn
+     * @return
+     */
     private static boolean isValidRecipeId(int id, Connection conn) {
         if (id <= 0) {
             return false;
         }
 
         try {
-            //query to find recipes with a given recipe id
+            // query to find recipes with a given recipe id
             String query = "SELECT * FROM recipe WHERE recipe_id=?";
-             //setting 
+            // setting
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setInt(1, id);
-            //creating result set 
+            // creating result set
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return true;
@@ -528,19 +580,26 @@ public class RecipeDatabase {
         return false;
 
     }
-    //validation that twopasswords are equal when creating account
+
+    /**
+     * validation that twopasswords are equal when creating account
+     * 
+     * @param conn
+     * @param password
+     * @return
+     */
     private static boolean isValidPassword(Connection conn, String password) {
         if (password.equals("")) {
             return false;
         }
         try {
-            //setting up query to find password from account
+            // setting up query to find password from account
             String query = "SELECT * FROM account WHERE password=?";
-            //setting up prepared statement for query
+            // setting up prepared statement for query
             PreparedStatement stmt = conn.prepareStatement(query);
-            //setting values for password
+            // setting values for password
             stmt.setString(1, password);
-            //creating result set and executing query
+            // creating result set and executing query
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return true;
@@ -550,19 +609,25 @@ public class RecipeDatabase {
         }
         return false;
     }
-    //create account screen
+
+    /**
+     * create account screen
+     * 
+     * @param sc
+     * @param conn
+     */
     public static void createAccountScreen(Scanner sc, Connection conn) {
-        //declartation of values to be entered 
+        // declartation of values to be entered
         boolean isNotValidInput = true;
         String username = "";
         String password1 = "";
         String email = "";
         String country = "";
         String dob = "";
-        //validation that input works
+        // validation that input works
         while (isNotValidInput) {
             Console console = System.console();
-            //outputting request for values ot be inputted and having user enter them
+            // outputting request for values ot be inputted and having user enter them
             System.out.println("ACCOUNT CREATION:");
             System.out.print("Enter username: ");
             username = console.readLine();
@@ -587,23 +652,23 @@ public class RecipeDatabase {
 
                     System.out.print("Enter country residence: ");
                     country = console.readLine();
-                    //validating passwords entered are equal to one another
+                    // validating passwords entered are equal to one another
                     if ((username.equals("") || password1.equals("") || email.equals("") || country.equals("")
                             || dob.equals(""))
                             || (username.length() > 30 || password1.length() > 30 || country.length() > 2)) {
                         System.out.println("Invalid input. Please enter valid input.");
-                    } 
-                    //excutes granted all values are valid
+                    }
+                    // excutes granted all values are valid
                     else {
                         isNotValidInput = false;
                         System.out.println();
                         break;
                     }
-                //output if passwords do not match
+                    // output if passwords do not match
                 } else {
                     System.out.println("Your passwords do not match! Try again!");
                 }
-                //outputs if user trys to create an account when one already exists
+                // outputs if user trys to create an account when one already exists
             } else {
                 System.out.println("That user already exists! Try again!");
             }
@@ -624,10 +689,11 @@ public class RecipeDatabase {
             e.printStackTrace();
         }
     }
-    
+
     /**
-     * lists out each of the recipes that the user has made
-     * doesn't include recipes that the user is following
+     * lists out each of the recipes that the user has made doesn't include recipes
+     * that the user is following
+     * 
      * @param conn
      */
     public static void listRecipes(Connection conn) {
@@ -667,8 +733,8 @@ public class RecipeDatabase {
     }
 
     /**
-     * prints out each of the recipe instructions
-     * in a nicely formatted fashion
+     * prints out each of the recipe instructions in a nicely formatted fashion
+     * 
      * @param strInstr
      */
     private static void printInstructions(String strInstr) {
@@ -681,6 +747,7 @@ public class RecipeDatabase {
 
     /**
      * parses the date from SQL into a String format
+     * 
      * @param date
      * @return a String that represents the given date
      */
@@ -690,9 +757,9 @@ public class RecipeDatabase {
     }
 
     /**
-     * prints out the news feed in the application
-     * shows recipes and recipe comments for each user
-     * that the current user is following
+     * prints out the news feed in the application shows recipes and recipe comments
+     * for each user that the current user is following
+     * 
      * @param conn
      */
     private static void listNewsFeed(Connection conn) {
@@ -741,6 +808,7 @@ public class RecipeDatabase {
 
     /**
      * allows the user to enter their own recipe into the application
+     * 
      * @param sc
      * @param conn
      */
@@ -804,6 +872,7 @@ public class RecipeDatabase {
 
     /**
      * allows users to update any of their current recipes in the application
+     * 
      * @param sc
      * @param con
      */
@@ -853,6 +922,7 @@ public class RecipeDatabase {
 
     /**
      * checks whether the given recipe id is a valid updatable recipe
+     * 
      * @param id
      * @param conn
      * @return either true or false depending on if the id is a valid recipe id
@@ -877,8 +947,9 @@ public class RecipeDatabase {
 
     /**
      * method that makes the initial connection to the database
-     * @return a Connection that can be used within the rest of 
-     * the application to process queries and updates
+     * 
+     * @return a Connection that can be used within the rest of the application to
+     *         process queries and updates
      */
     private static Connection connectToDB() {
         boolean isNotValidInput = true;
